@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>CSMC Revenue Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<div class="top-header">
+  <div class="header-left">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">&#9776;</button>
+    <img src="csmc_new_logo-removebg-preview (1).png" alt="CSMC Logo" class="header-logo">
+  </div>
+  <div class="header-title">
+    <h1>CHHATRAPATI SAMBHAJINAGAR MUNICIPAL CORPORATION</h1>
+    <div class="header-subtitle">Revenue Dashboard</div>
+  </div>
+  <div class="header-right">
+    <div class="live-clock">
+      <div id="clockTime">00:00:00</div>
+      <div id="clockDate">Mon, 01 Jan 2025</div>
+    </div>
+    <img src="ascdcl_logo-removebg-preview.png" alt="Smart City Logo" class="header-logo">
+  </div>
+</div>
+
+<!-- BREADCRUMB BAR -->
+<div class="breadcrumb-bar">
+  <div class="breadcrumb-left">
+    <span class="breadcrumb-title" id="breadcrumbTitle">Dashboard</span>
+    <span class="breadcrumb-sep"></span>
+    <span class="breadcrumb-link" id="breadcrumbLink">Overview</span>
+  </div>
+  <div class="breadcrumb-right">
+    <div class="fy-switcher">
+      <button class="fy-btn active" id="fyBtn2526" onclick="switchFY('2025-26',this)">FY 2025-26</button>
+      <button class="fy-btn" id="fyBtn2425" onclick="switchFY('2024-25',this)">FY 2024-25</button>
+    </div>
+    <span>&#8962; Home</span>
+    <span class="bc-sep">/</span>
+    <span id="breadcrumbCurrent">Overview</span>
+  </div>
+</div>
+
+<div class="page-wrapper">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-label">MAIN NAVIGATION</div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Revenue Heads</div>
+    <button class="nav-btn active" id="nav-home" onclick="showSection('home','Overview')">
+      <span class="nav-icon"></span> Overview
+    </button>
+    <button class="nav-btn" id="nav-property" onclick="showSection('property','Property Tax')">
+      <span class="nav-icon"></span> Property Tax
+    </button>
+    <button class="nav-btn" id="nav-water" onclick="showSection('water','Water Charges')">
+      <span class="nav-icon"></span> Water Charges
+    </button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title"> Miscellaneous (Head Office)</div>
+    <button class="nav-btn" id="nav-gunthewari" onclick="showSection('gunthewari','Gunthewari')">
+      <span class="nav-icon"></span> Gunthewari
+    </button>
+    <button class="nav-btn" id="nav-building" onclick="showSection('building','Building Permission')">
+      <span class="nav-icon"></span> Building Permission
+    </button>
+    <button class="nav-btn" id="nav-betterment" onclick="showSection('betterment','Betterment Charges')">
+      <span class="nav-icon"></span> Betterment Charges
+    </button>
+    <button class="nav-btn" id="nav-tanker" onclick="showSection('tanker','Tanker Bhade')">
+      <span class="nav-icon"></span> Tanker Bhade
+    </button>
+    <button class="nav-btn" id="nav-newwater" onclick="showSection('newwater','New Water Connection')">
+      <span class="nav-icon"></span> New Water Connection
+    </button>
+    <button class="nav-btn" id="nav-health" onclick="showSection('health','Health & Sewerage')">
+      <span class="nav-icon"></span> Health &amp; Sewerage
+    </button>
+    <button class="nav-btn" id="nav-fire" onclick="showSection('fire','Fire NOC')">
+      <span class="nav-icon"></span> Fire NOC
+    </button>
+    <button class="nav-btn" id="nav-license" onclick="showSection('license','Trade License')">
+      <span class="nav-icon"></span> Trade License
+    </button>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">Analytics</div>
+    <button class="nav-btn" id="nav-outstanding" onclick="showSection('outstanding','Total Outstanding')">
+      <span class="nav-icon"></span> Outstanding
+    </button>
+    <button class="nav-btn" id="nav-rts" onclick="showSection('rts','RTS Collections')">
+      <span class="nav-icon"></span> RTS Collections
+    </button>
+    <button class="nav-btn" id="nav-digital" onclick="showSection('digital','Digital Collections')">
+      <span class="nav-icon"></span> Digital Collections
+    </button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ===== OVERVIEW ===== -->
+<div id="home" class="section active">
+  <div class="section-header">
+    <h2>Revenue Overview</h2>
+    <div class="section-meta">FY 2024-25 &nbsp;|&nbsp; All figures in Lakhs</div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row">
+
+    <div class="kpi-card kpi-property" onclick="showSection('property','Property Tax')">
+      <div class="kpi-title"> Property Tax</div>
+      <div class="kpi-full" id="kpi-prop-full">&#8212;</div>
+      <div class="kpi-short" id="kpi-prop-short">&#8212;</div>
+      <div class="kpi-divider"></div>
+      <div class="kpi-meta">Demand: <strong id="kpi-prop-demand">&#8212;</strong></div>
+      <div class="kpi-meta" id="kpi-prop-eff">&#8212;</div>
+      <div class="kpi-badge yoy-up" id="kpi-prop-yoy">YoY</div>
+    </div>
+
+    <div class="kpi-card kpi-water" onclick="showSection('water','Water Charges')">
+      <div class="kpi-title"> Water Charges</div>
+      <div class="kpi-full" id="kpi-water-full">&#8212;</div>
+      <div class="kpi-short" id="kpi-water-short">&#8212;</div>
+      <div class="kpi-divider"></div>
+      <div class="kpi-meta">Demand: <strong id="kpi-water-demand">&#8212;</strong></div>
+      <div class="kpi-meta" id="kpi-water-eff">&#8212;</div>
+      <div class="kpi-badge yoy-up" id="kpi-water-yoy">YoY</div>
+    </div>
+
+    <div class="kpi-card kpi-misc" onclick="showSection('gunthewari','Gunthewari')">
+      <div class="kpi-title"> Miscellaneous (8 Heads)</div>
+      <div class="kpi-full" id="kpi-misc-full">&#8212;</div>
+      <div class="kpi-short" id="kpi-misc-short">&#8212;</div>
+      <div class="kpi-divider"></div>
+      <div class="kpi-meta">Head Office collections</div>
+      <div class="kpi-meta" id="kpi-misc-eff">&#8212;</div>
+      <div class="kpi-badge yoy-up" id="kpi-misc-yoy">YoY</div>
+    </div>
+
+    <div class="kpi-card kpi-digital" onclick="showSection('digital','Digital Collections')">
+      <div class="kpi-title"> Digital Collections</div>
+      <div class="kpi-full" id="kpi-digital-full">&#8212;</div>
+      <div class="kpi-short" id="kpi-digital-short">&#8212;</div>
+      <div class="kpi-divider"></div>
+      <div class="kpi-meta">Online + UPI + NEFT</div>
+      <div class="kpi-meta" id="kpi-digital-pct">&#8212;</div>
+      <div class="kpi-badge yoy-up">Digital</div>
+    </div>
+
+    <div class="kpi-card kpi-outstanding" onclick="showSection('outstanding','Total Outstanding')">
+      <div class="kpi-title"> Total Outstanding</div>
+      <div class="kpi-full" id="kpi-out-full">&#8212;</div>
+      <div class="kpi-short" id="kpi-out-short">&#8212;</div>
+      <div class="kpi-divider"></div>
+      <div class="kpi-meta">Pending recovery</div>
+      <div class="kpi-meta" id="kpi-out-pct">&#8212;</div>
+      <div class="kpi-badge yoy-down">Due</div>
+    </div>
+
+  </div>
+  <!-- OVERVIEW CHARTS -->
+  <div class="grid">
+    <div class="chart-box full-width h300"><canvas id="overviewZoneChart"></canvas></div>
+    <div class="chart-box h300"><canvas id="overviewMonthlyTrend"></canvas></div>
+    <div class="chart-box h300"><canvas id="overviewMiscBreakdown"></canvas></div>
+    <div class="chart-box h300"><canvas id="overviewYoY"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== PROPERTY TAX ===== -->
+<div id="property" class="section">
+  <div class="section-header">
+    <h2>Property Tax</h2>
+    <div class="section-meta">Zone-wise | FY 2024-25</div>
+  </div>
+  <div class="stat-strip" id="propStatStrip"></div>
+  <div class="toolbar">
+    <div class="filters">
+      <select id="wardFilter"><option value="all">All Zones</option>
+        <option>A-1</option><option>B-5</option><option>C-3</option><option>D-9</option>
+        <option>E-6</option><option>F-7</option><option>G-2</option><option>H-4</option>
+        <option>I-8</option><option>J-10</option>
+      </select>
+      <input type="date" id="fromDate"><input type="date" id="toDate">
+      <button class="btn-primary" onclick="applyFilters()">Apply</button>
+    </div>
+    <div class="mode-filter" id="propertyModeFilter">
+      <span class="mode-label">Mode:</span>
+      <button class="mode-btn active" onclick="setMode('property','all',this)">All</button>
+      <button class="mode-btn online" onclick="setMode('property','online',this)"> Online</button>
+      <button class="mode-btn cash"   onclick="setMode('property','cash',this)"> Cash</button>
+      <button class="mode-btn cheque" onclick="setMode('property','cheque',this)"> Cheque</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="chart-box full-width h300"><canvas id="propertyDemandCollectionChart"></canvas></div>
+    <div class="chart-box h250"><canvas id="propertyPie"></canvas></div>
+    <div class="chart-box h250"><canvas id="outstandingChart"></canvas></div>
+    <div class="chart-box h250"><canvas id="propertyMoM"></canvas></div>
+    <div class="chart-box h250"><canvas id="propertyYoY"></canvas></div>
+  </div>
+  <div class="table-wrapper">
+    <table id="dataTable">
+      <thead><tr><th>ID</th><th>Owner</th><th>Zone</th><th>Demand ₹</th><th>Collection ₹</th><th>Mode</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div id="pagination"></div>
+</div>
+
+<!-- ===== WATER CHARGES ===== -->
+<div id="water" class="section">
+  <div class="section-header">
+    <h2>Water Charges</h2>
+    <div class="section-meta">Zone-wise | FY 2024-25</div>
+  </div>
+  <div class="stat-strip" id="waterStatStrip"></div>
+  <div class="toolbar">
+    <div class="mode-filter" id="waterModeFilter">
+      <span class="mode-label">Mode:</span>
+      <button class="mode-btn active" onclick="setMode('water','all',this)">All</button>
+      <button class="mode-btn online" onclick="setMode('water','online',this)"> Online</button>
+      <button class="mode-btn cash"   onclick="setMode('water','cash',this)"> Cash</button>
+      <button class="mode-btn cheque" onclick="setMode('water','cheque',this)"> Cheque</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="chart-box full-width h300"><canvas id="waterDemandCollectionChart"></canvas></div>
+    <div class="chart-box h250"><canvas id="waterPie"></canvas></div>
+    <div class="chart-box h250"><canvas id="waterMoM"></canvas></div>
+    <div class="chart-box h250"><canvas id="waterYoY"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== MISC SECTIONS (Head Office) â€” one template per service ===== -->
+<div id="gunthewari"  class="section misc-section" data-key="gunthewari"></div>
+<div id="building"    class="section misc-section" data-key="building"></div>
+<div id="betterment"  class="section misc-section" data-key="betterment"></div>
+<div id="tanker"      class="section misc-section" data-key="tanker"></div>
+<div id="newwater"    class="section misc-section" data-key="newwater"></div>
+<div id="health"      class="section misc-section" data-key="health"></div>
+<div id="fire"        class="section misc-section" data-key="fire"></div>
+<div id="license"     class="section misc-section" data-key="license"></div>
+
+<!-- ===== RTS COLLECTIONS ===== -->
+<div id="rts" class="section">
+  <div class="section-header">
+    <h2>RTS Collections</h2>
+    <div class="section-meta">Right to Service Act - Head Office | FY 2024-25</div>
+  </div>
+  <p class="section-note">RTS mandates time-bound service delivery. This view tracks applications received, resolved within RTS timeline, and pending.</p>
+  <div class="grid">
+    <div class="chart-box full-width h300"><canvas id="rtsMonthlyChart"></canvas></div>
+    <div class="chart-box h250"><canvas id="rtsStatusPie"></canvas></div>
+    <div class="chart-box h250"><canvas id="rtsServiceBar"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== DIGITAL COLLECTIONS ===== -->
+<div id="digital" class="section">
+  <div class="section-header">
+    <h2>Digital Collections</h2>
+    <div class="section-meta">Online | UPI | NEFT/RTGS | FY 2024-25</div>
+  </div>
+  <div class="grid">
+    <div class="chart-box full-width h300"><canvas id="digitalMonthlyChart"></canvas></div>
+    <div class="chart-box h250"><canvas id="digitalModePie"></canvas></div>
+    <div class="chart-box h250"><canvas id="digitalHeadBar"></canvas></div>
+    <div class="chart-box h250"><canvas id="digitalYoY"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== TOTAL OUTSTANDING ===== -->
+<div id="outstanding" class="section">
+  <div class="section-header">
+    <h2>⚠️ Total Outstanding</h2>
+    <div class="section-meta">Zone-wise + Head Office | FY <span class="fy-label">2025-26</span></div>
+  </div>
+  <div class="stat-strip" id="outStatStrip"></div>
+  <div class="grid">
+    <div class="chart-box full-width h300"><canvas id="outZoneBar"></canvas></div>
+    <div class="chart-box h280"><canvas id="outHeadBar"></canvas></div>
+    <div class="chart-box h280"><canvas id="outPie"></canvas></div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+</div><!-- end .page-wrapper -->
+
+<script src="script.js"></script>
+</body>
+</html>
+
