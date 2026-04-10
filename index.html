@@ -104,7 +104,10 @@
       <span class="nav-icon"></span> RTS Collections
     </button>
     <button class="nav-btn" id="nav-digital" onclick="showSection('digital','Digital Collections')">
-      <span class="nav-icon"></span> Digital Collections
+      <span class="nav-icon">💻</span> Digital Collections
+    </button>
+    <button class="nav-btn" id="nav-reports" onclick="showSection('reports','Reports')">
+      <span class="nav-icon">📊</span> Reports
     </button>
   </div>
 </div>
@@ -116,7 +119,7 @@
 <div id="home" class="section active">
   <div class="section-header">
     <h2>Revenue Overview</h2>
-    <div class="section-meta">FY 2024-25 &nbsp;|&nbsp; All figures in Lakhs</div>
+    <div class="section-meta" id="overviewMeta">FY 2025-26 &nbsp;|&nbsp; All figures in ₹ Lakhs</div>
   </div>
 
   <!-- KPI CARDS -->
@@ -143,7 +146,7 @@
     </div>
 
     <div class="kpi-card kpi-misc" onclick="showSection('gunthewari','Gunthewari')">
-      <div class="kpi-title"> Miscellaneous (8 Heads)</div>
+      <div class="kpi-title"> Miscellaneous </div>
       <div class="kpi-full" id="kpi-misc-full">&#8212;</div>
       <div class="kpi-short" id="kpi-misc-short">&#8212;</div>
       <div class="kpi-divider"></div>
@@ -186,18 +189,27 @@
 <div id="property" class="section">
   <div class="section-header">
     <h2>Property Tax</h2>
-    <div class="section-meta">Zone-wise | FY 2024-25</div>
+    
+    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2025-26</div>
   </div>
   <div class="stat-strip" id="propStatStrip"></div>
   <div class="toolbar">
     <div class="filters">
-      <select id="wardFilter"><option value="all">All Zones</option>
-        <option>A-1</option><option>B-5</option><option>C-3</option><option>D-9</option>
-        <option>E-6</option><option>F-7</option><option>G-2</option><option>H-4</option>
-        <option>I-8</option><option>J-10</option>
+      <label class="filter-label">Zone:</label>
+      <select id="zoneTableFilter" onchange="currentPage=1;displayTable();">
+        <option value="all">All Zones</option>
+        <option value="A-1">A-1</option><option value="B-5">B-5</option>
+        <option value="C-3">C-3</option><option value="D-9">D-9</option>
+        <option value="E-6">E-6</option><option value="F-7">F-7</option>
+        <option value="G-2">G-2</option><option value="H-4">H-4 (Zone 4-H — Real Data)</option>
+        <option value="I-8">I-8</option><option value="J-10">J-10</option>
       </select>
-      <input type="date" id="fromDate"><input type="date" id="toDate">
+      <label class="filter-label">From:</label>
+      <input type="date" id="fromDate">
+      <label class="filter-label">To:</label>
+      <input type="date" id="toDate">
       <button class="btn-primary" onclick="applyFilters()">Apply</button>
+      <button class="btn-secondary" onclick="clearFilters()">Clear</button>
     </div>
     <div class="mode-filter" id="propertyModeFilter">
       <span class="mode-label">Mode:</span>
@@ -216,7 +228,25 @@
   </div>
   <div class="table-wrapper">
     <table id="dataTable">
-      <thead><tr><th>ID</th><th>Owner</th><th>Zone</th><th>Demand ₹</th><th>Collection ₹</th><th>Mode</th><th>Status</th></tr></thead>
+      <thead>
+        <tr>
+          <th title="Unique property identifier from backend">Prop. ID</th>
+          <th title="Name of the property owner">Owner Name</th>
+          <th title="Property address">Address</th>
+          <th title="Zone / Ward">Zone</th>
+          <th title="Residential / Commercial / Educational">Type</th>
+          <th title="Arrears: unpaid amount from previous years" class="has-tip">Arrears (₹)</th>
+          <th title="Current year's tax demand" class="has-tip">Current (₹)</th>
+          <th title="Penalty on late payment" class="has-tip">Penalty (₹)</th>
+          <th title="Penalty already paid" class="has-tip">Paid Penalty (₹)</th>
+          <th title="Rebate given (e.g. early payment discount)" class="has-tip">Rebate (₹)</th>
+          <th title="Total Demand = Arrears + Current + Penalty − Rebate" class="has-tip">Total Demand (₹)</th>
+          <th title="Total amount collected so far" class="has-tip">Total Collection (₹)</th>
+          <th title="Total Outstanding = Total Demand − Total Collection" class="has-tip">Outstanding (₹)</th>
+          <th title="Payment mode used">Mode</th>
+          <th title="Paid = Collection ≥ Demand">Status</th>
+        </tr>
+      </thead>
       <tbody></tbody>
     </table>
   </div>
@@ -227,10 +257,18 @@
 <div id="water" class="section">
   <div class="section-header">
     <h2>Water Charges</h2>
-    <div class="section-meta">Zone-wise | FY 2024-25</div>
+    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2025-26</div>
   </div>
   <div class="stat-strip" id="waterStatStrip"></div>
   <div class="toolbar">
+    <div class="filters">
+      <label class="filter-label">From:</label>
+      <input type="date" id="waterFromDate">
+      <label class="filter-label">To:</label>
+      <input type="date" id="waterToDate">
+      <button class="btn-primary" onclick="applyDateFilter('water')">Apply</button>
+      <button class="btn-secondary" onclick="clearDateFilter('water')">Clear</button>
+    </div>
     <div class="mode-filter" id="waterModeFilter">
       <span class="mode-label">Mode:</span>
       <button class="mode-btn active" onclick="setMode('water','all',this)">All</button>
@@ -260,14 +298,58 @@
 <!-- ===== RTS COLLECTIONS ===== -->
 <div id="rts" class="section">
   <div class="section-header">
-    <h2>RTS Collections</h2>
-    <div class="section-meta">Right to Service Act - Head Office | FY 2024-25</div>
+    <h2> RTS Collections</h2>
+    <div class="section-meta fy-meta" data-suffix="Right to Service Act — All Departments">Right to Service Act — All Departments | FY 2025-26</div>
   </div>
-  <p class="section-note">RTS mandates time-bound service delivery. This view tracks applications received, resolved within RTS timeline, and pending.</p>
+  <p class="section-note">RTS mandates time-bound service delivery. 74 services across 10 departments. Fee-based and free services tracked separately.</p>
+
+  <div class="data-source-banner">
+    <span class="ds-icon">⚠️</span>
+    <div>
+      <strong>Sample / Rate-Chart Data — Live Backend Not Yet Connected</strong><br>
+      <span>Transaction counts shown are from the Rate Chart document provided. Resolved/Pending figures are illustrative estimates.</span>
+    </div>
+    <div class="ds-schema">
+      <strong>Expected Backend Columns:</strong>
+      Application No. &nbsp;|&nbsp; Department &nbsp;|&nbsp; Service Name &nbsp;|&nbsp; Applicant Name &nbsp;|&nbsp; Application Date &nbsp;|&nbsp; Resolution Date &nbsp;|&nbsp; RTS Deadline &nbsp;|&nbsp; Status (Resolved / Pending / Delayed) &nbsp;|&nbsp; Fee Collected (₹) &nbsp;|&nbsp; Payment Mode
+    </div>
+  </div>
+
+  <!-- RTS KPI strip -->
+  <div class="stat-strip" id="rtsStatStrip"></div>
+
+  <!-- Department tabs -->
+  <div class="rts-dept-tabs" id="rtsDeptTabs"></div>
+
+  <!-- Charts row -->
   <div class="grid">
     <div class="chart-box full-width h300"><canvas id="rtsMonthlyChart"></canvas></div>
-    <div class="chart-box h250"><canvas id="rtsStatusPie"></canvas></div>
-    <div class="chart-box h250"><canvas id="rtsServiceBar"></canvas></div>
+    <div class="chart-box h280"><canvas id="rtsDeptBar"></canvas></div>
+    <div class="chart-box h280"><canvas id="rtsStatusPie"></canvas></div>
+    <div class="chart-box h280"><canvas id="rtsFeeVsFree"></canvas></div>
+  </div>
+
+  <!-- Department-wise service table -->
+  <div class="rts-table-header">
+    <span id="rtsDeptTitle">All Departments</span>
+    <span class="section-meta" id="rtsServiceCount"></span>
+  </div>
+  <div class="table-wrapper">
+    <table id="rtsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Department</th>
+          <th>Service</th>
+          <th>Fee</th>
+          <th>Annual Transactions</th>
+          <th>Resolved</th>
+          <th>Pending</th>
+          <th>Compliance %</th>
+        </tr>
+      </thead>
+      <tbody id="rtsTableBody"></tbody>
+    </table>
   </div>
 </div>
 
@@ -275,7 +357,7 @@
 <div id="digital" class="section">
   <div class="section-header">
     <h2>Digital Collections</h2>
-    <div class="section-meta">Online | UPI | NEFT/RTGS | FY 2024-25</div>
+    <div class="section-meta fy-meta" data-suffix="Online | UPI | NEFT/RTGS">Online | UPI | NEFT/RTGS | FY 2025-26</div>
   </div>
   <div class="grid">
     <div class="chart-box full-width h300"><canvas id="digitalMonthlyChart"></canvas></div>
@@ -288,8 +370,8 @@
 <!-- ===== TOTAL OUTSTANDING ===== -->
 <div id="outstanding" class="section">
   <div class="section-header">
-    <h2>⚠️ Total Outstanding</h2>
-    <div class="section-meta">Zone-wise + Head Office | FY <span class="fy-label">2025-26</span></div>
+    <h2> Total Outstanding</h2>
+    <div class="section-meta fy-meta" data-suffix="Zone-wise + Head Office">Zone-wise + Head Office | FY 2025-26</div>
   </div>
   <div class="stat-strip" id="outStatStrip"></div>
   <div class="grid">
@@ -299,10 +381,109 @@
   </div>
 </div>
 
+<!-- ===== REPORTS ===== -->
+<div id="reports" class="section">
+  <div class="section-header">
+    <h2>📊 Reports</h2>
+    <div class="section-meta fy-meta" data-suffix="Property Reports">Property Reports | FY 2025-26</div>
+  </div>
+
+  <!-- Report tabs -->
+  <div class="report-tabs">
+    <button class="report-tab active" onclick="showReport('rpt-zone-count',this)">Zone-wise Property Count</button>
+    <button class="report-tab" onclick="showReport('rpt-usage-wise',this)">Property Count Zone &amp; Usage wise</button>
+    <button class="report-tab" onclick="showReport('rpt-daywise',this)">Day-wise Collection</button>
+  </div>
+
+  <!-- Report 1: Zone-wise Property Count -->
+  <div id="rpt-zone-count" class="report-panel active">
+    <div class="report-toolbar">
+      <span class="report-title">Zone wise Property Count Report</span>
+      <div class="report-actions">
+        <input type="text" id="rptZoneSearch" placeholder="Search..." oninput="filterReport('rpt-zone-count')" class="report-search">
+        <button class="rpt-btn" onclick="exportTableCSV('rptZoneTable','zone_property_count')">CSV</button>
+        <button class="rpt-btn" onclick="exportTableExcel('rptZoneTable','zone_property_count')">Excel</button>
+        <button class="rpt-btn" onclick="printReport('rpt-zone-count')">Print</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table id="rptZoneTable">
+        <thead>
+          <tr>
+            <th>Zone</th>
+            <th title="Total properties registered till date">Property Count Till Date</th>
+            <th title="New properties added in current FY">Property Count Current Year</th>
+          </tr>
+        </thead>
+        <tbody id="rptZoneBody"></tbody>
+        <tfoot id="rptZoneFoot"></tfoot>
+      </table>
+    </div>
+    <div class="report-footer" id="rptZoneFooter"></div>
+  </div>
+
+  <!-- Report 2: Zone & Usage wise -->
+  <div id="rpt-usage-wise" class="report-panel">
+    <div class="report-toolbar">
+      <span class="report-title">Property Count Zone-wise &amp; Usage-wise</span>
+      <div class="report-actions">
+        <input type="text" id="rptUsageSearch" placeholder="Search..." oninput="filterReport('rpt-usage-wise')" class="report-search">
+        <button class="rpt-btn" onclick="exportTableCSV('rptUsageTable','zone_usage_wise')">CSV</button>
+        <button class="rpt-btn" onclick="exportTableExcel('rptUsageTable','zone_usage_wise')">Excel</button>
+        <button class="rpt-btn" onclick="printReport('rpt-usage-wise')">Print</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table id="rptUsageTable">
+        <thead>
+          <tr>
+            <th>Ward</th>
+            <th>Usage Type</th>
+            <th>Received Date</th>
+            <th>Count</th>
+            <th>Collection (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="rptUsageBody"></tbody>
+      </table>
+    </div>
+    <div class="report-footer" id="rptUsageFooter"></div>
+  </div>
+
+  <!-- Report 3: Day-wise Collection -->
+  <div id="rpt-daywise" class="report-panel">
+    <div class="report-toolbar">
+      <span class="report-title">Day-wise Collection Report</span>
+      <div class="report-actions">
+        <input type="text" id="rptDaySearch" placeholder="Search..." oninput="filterReport('rpt-daywise')" class="report-search">
+        <button class="rpt-btn" onclick="exportTableCSV('rptDayTable','daywise_collection')">CSV</button>
+        <button class="rpt-btn" onclick="exportTableExcel('rptDayTable','daywise_collection')">Excel</button>
+        <button class="rpt-btn" onclick="printReport('rpt-daywise')">Print</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table id="rptDayTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Amount Collection (₹)</th>
+            <th>Pay Mode</th>
+          </tr>
+        </thead>
+        <tbody id="rptDayBody"></tbody>
+      </table>
+    </div>
+    <div class="report-footer" id="rptDayFooter"></div>
+  </div>
+</div>
+
 </div><!-- end .main -->
 </div><!-- end .page-wrapper -->
 
 <script src="script.js"></script>
 </body>
 </html>
+
+
+
 

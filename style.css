@@ -100,6 +100,9 @@ body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;display
 input,select{padding:5px 8px;border:1px solid #d0d7de;border-radius:6px;font-size:.82rem;background:#fff;color:#222;}
 .btn-primary{padding:5px 14px;background:#1a3a5c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;-webkit-transition:background .2s;-o-transition:background .2s;transition:background .2s;}
 .btn-primary:hover{background:#0d2137;}
+.btn-secondary{padding:5px 14px;background:#eef2f5;color:#444;border:1px solid #ccc;border-radius:6px;cursor:pointer;font-size:.82rem;-webkit-transition:background .2s;-o-transition:background .2s;transition:background .2s;}
+.btn-secondary:hover{background:#dde3ea;}
+.filter-label{font-size:.8rem;color:#555;font-weight:600;white-space:nowrap;}
 
 /* ===== MODE FILTER ===== */
 .mode-filter{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:6px;}
@@ -144,8 +147,48 @@ tr:hover td{background:#f5f8ff;}
 .misc-head-card-value{font-size:1.1rem;font-weight:700;color:#0d2137;margin-top:2px;}
 .misc-head-card-sub{font-size:.65rem;color:#aaa;margin-top:1px;}
 
-/* ===== NOTES ===== */
+/* ===== TOOLTIPS on th ===== */
+th[title]{cursor:help;position:relative;}
+th[title]:hover::after{
+  content:attr(title);
+  position:absolute;top:110%;left:50%;-webkit-transform:translateX(-50%);-ms-transform:translateX(-50%);transform:translateX(-50%);
+  background:#0d2137;color:#fff;font-size:.7rem;padding:5px 10px;border-radius:6px;
+  white-space:nowrap;z-index:999;font-weight:400;letter-spacing:0;text-transform:none;
+  -webkit-box-shadow:0 2px 8px rgba(0,0,0,.25);box-shadow:0 2px 8px rgba(0,0,0,.25);
+  pointer-events:none;
+}
+
+/* ===== CHART BOX TOOLTIP LABEL ===== */
+.chart-box-label{font-size:.72rem;color:#888;margin-bottom:4px;display:block;}
 .section-note{font-size:.8rem;color:#666;background:#fff8e1;border-left:3px solid #c98a00;padding:7px 12px;border-radius:6px;margin:0 0 14px;}
+
+/* ===== DATA SOURCE BANNER ===== */
+.data-source-banner{
+  background:#fff3cd;border:1px solid #f0c040;border-left:4px solid #c98a00;
+  border-radius:8px;padding:12px 16px;margin-bottom:14px;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-ms-flex-direction:column;flex-direction:column;gap:8px;
+}
+.ds-icon{font-size:1.1rem;}
+.data-source-banner strong{color:#7a5200;font-size:.82rem;}
+.data-source-banner span{font-size:.78rem;color:#666;}
+.ds-schema{
+  background:#fff;border:1px dashed #c98a00;border-radius:6px;
+  padding:7px 12px;font-size:.75rem;color:#555;line-height:1.7;
+}
+.ds-schema strong{color:#0d2137;display:block;margin-bottom:2px;}
+
+/* ===== RTS MODULE ===== */
+.rts-dept-tabs{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.rts-tab{padding:5px 14px;border:2px solid #d0d7de;border-radius:20px;background:#f5f7fa;color:#444;cursor:pointer;font-size:.75rem;font-weight:600;-webkit-transition:all .15s;-o-transition:all .15s;transition:all .15s;white-space:nowrap;}
+.rts-tab:hover{border-color:#1a3a5c;background:#eef2f5;}
+.rts-tab.active{background:#1a3a5c;color:#fff;border-color:#1a3a5c;}
+.rts-table-header{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;gap:10px;margin:16px 0 6px;font-weight:700;color:#0d2137;font-size:.95rem;}
+.compliance-high{color:#0a6b3a;font-weight:700;}
+.compliance-mid{color:#c98a00;font-weight:700;}
+.compliance-low{color:#c0202e;font-weight:700;}
+.fee-badge{background:#e8f4fd;color:#1a6fa8;border-radius:8px;padding:2px 7px;font-size:.7rem;font-weight:600;}
+.free-badge{background:#e8fdf0;color:#0a6b3a;border-radius:8px;padding:2px 7px;font-size:.7rem;font-weight:600;}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:900px){
@@ -161,7 +204,8 @@ tr:hover td{background:#f5f8ff;}
 @media(max-width:600px){
   .top-header{padding:5px 10px;min-height:58px;}
   .header-logo{height:40px;width:40px;}
-  .header-title h1{font-size:clamp(.6rem,3.2vw,.85rem);}
+  .header-title{white-space:normal;}
+  .header-title h1{font-size:clamp(.7rem,3.5vw,1rem);white-space:normal;word-break:break-word;letter-spacing:0;}
   .header-subtitle{display:none;}
   .breadcrumb-right{display:none;}
   .kpi-card{-ms-flex:1 1 calc(50% - 6px);-webkit-box-flex:1;flex:1 1 calc(50% - 6px);padding:10px 12px;}
@@ -176,3 +220,19 @@ tr:hover td{background:#f5f8ff;}
 }
 
 
+
+/* ===== REPORTS MODULE ===== */
+.report-tabs{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:0;margin-bottom:0;border-bottom:2px solid #dde3ea;}
+.report-tab{padding:8px 20px;border:none;background:none;color:#666;cursor:pointer;font-size:.82rem;font-weight:600;border-bottom:3px solid transparent;margin-bottom:-2px;-webkit-transition:all .15s;-o-transition:all .15s;transition:all .15s;white-space:nowrap;}
+.report-tab:hover{color:#1a3a5c;background:#f5f7fa;}
+.report-tab.active{color:#1a3a5c;border-bottom-color:#1a3a5c;background:#fff;}
+.report-panel{display:none;background:#fff;border-radius:0 0 10px 10px;padding:16px;-webkit-box-shadow:0 2px 8px rgba(0,0,0,.07);box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.report-panel.active{display:block;}
+.report-toolbar{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.report-title{font-size:.95rem;font-weight:700;color:#0d2137;}
+.report-actions{display:-webkit-box;display:-ms-flexbox;display:flex;gap:6px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-ms-flex-wrap:wrap;flex-wrap:wrap;}
+.report-search{padding:5px 10px;border:1px solid #d0d7de;border-radius:6px;font-size:.8rem;width:160px;}
+.rpt-btn{padding:4px 12px;background:#1a3a5c;color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:.75rem;font-weight:600;-webkit-transition:background .15s;-o-transition:background .15s;transition:background .15s;}
+.rpt-btn:hover{background:#0d2137;}
+.report-footer{font-size:.75rem;color:#888;margin-top:8px;}
+tfoot td{font-weight:700;background:#f0f4f8;color:#0d2137;padding:8px 12px;border-top:2px solid #dde3ea;}
