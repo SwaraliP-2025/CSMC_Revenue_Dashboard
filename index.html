@@ -68,30 +68,24 @@
   </div>
 
   <div class="nav-group">
-    <div class="nav-group-title"> Miscellaneous (Head Office)</div>
-    <button class="nav-btn" id="nav-gunthewari" onclick="showSection('gunthewari','Gunthewari')">
-      <span class="nav-icon"></span> Gunthewari
+    <div class="nav-group-title">Miscellaneous (Head Office)</div>
+    <button class="nav-btn" id="nav-misc-health"    onclick="showSection('misc-health','Health & Medical')">
+      <span class="nav-icon"></span> Health &amp; Medical
     </button>
-    <button class="nav-btn" id="nav-building" onclick="showSection('building','Building Permission')">
-      <span class="nav-icon"></span> Building Permission
+    <button class="nav-btn" id="nav-misc-civic"     onclick="showSection('misc-civic','Public &amp; Civic Amenities')">
+      <span class="nav-icon"></span> Civic Amenities
     </button>
-    <button class="nav-btn" id="nav-betterment" onclick="showSection('betterment','Betterment Charges')">
-      <span class="nav-icon"></span> Betterment Charges
+    <button class="nav-btn" id="nav-misc-urban"     onclick="showSection('misc-urban','Urban Development')">
+      <span class="nav-icon"></span> Urban Development
     </button>
-    <button class="nav-btn" id="nav-tanker" onclick="showSection('tanker','Tanker Bhade')">
-      <span class="nav-icon"></span> Tanker Bhade
+    <button class="nav-btn" id="nav-misc-sanitation" onclick="showSection('misc-sanitation','Sanitation &amp; Environment')">
+      <span class="nav-icon"></span> Sanitation &amp; Env.
     </button>
-    <button class="nav-btn" id="nav-newwater" onclick="showSection('newwater','New Water Connection')">
-      <span class="nav-icon"></span> New Water Connection
+    <button class="nav-btn" id="nav-misc-safety"    onclick="showSection('misc-safety','Public Safety &amp; Licensing')">
+      <span class="nav-icon"></span> Safety &amp; Licensing
     </button>
-    <button class="nav-btn" id="nav-health" onclick="showSection('health','Health & Sewerage')">
-      <span class="nav-icon"></span> Health &amp; Sewerage
-    </button>
-    <button class="nav-btn" id="nav-fire" onclick="showSection('fire','Fire NOC')">
-      <span class="nav-icon"></span> Fire NOC
-    </button>
-    <button class="nav-btn" id="nav-license" onclick="showSection('license','Trade License')">
-      <span class="nav-icon"></span> Trade License
+    <button class="nav-btn" id="nav-misc-water"     onclick="showSection('misc-water','Water &amp; Infrastructure')">
+      <span class="nav-icon"></span> Water &amp; Infra
     </button>
   </div>
 
@@ -119,13 +113,13 @@
 <div id="home" class="section active">
   <div class="section-header">
     <h2>Revenue Overview</h2>
-    <div class="section-meta" id="overviewMeta">FY 2025-26 &nbsp;|&nbsp; All figures in ₹ Lakhs</div>
+    <div class="section-meta" id="overviewMeta">FY 2025-26 &nbsp;</div>
   </div>
 
   <!-- KPI CARDS -->
   <div class="kpi-row">
 
-    <div class="kpi-card kpi-property" onclick="showSection('property','Property Tax')">
+    <div class="kpi-card kpi-property">
       <div class="kpi-title"> Property Tax</div>
       <div class="kpi-full" id="kpi-prop-full">&#8212;</div>
       <div class="kpi-short" id="kpi-prop-short">&#8212;</div>
@@ -133,9 +127,10 @@
       <div class="kpi-meta">Demand: <strong id="kpi-prop-demand">&#8212;</strong></div>
       <div class="kpi-meta" id="kpi-prop-eff">&#8212;</div>
       <div class="kpi-badge yoy-up" id="kpi-prop-yoy">YoY</div>
+      <button class="kpi-more" onclick="showSection('property','Property Tax')">More info &#10140;</button>
     </div>
 
-    <div class="kpi-card kpi-water" onclick="showSection('water','Water Charges')">
+    <div class="kpi-card kpi-water">
       <div class="kpi-title"> Water Charges</div>
       <div class="kpi-full" id="kpi-water-full">&#8212;</div>
       <div class="kpi-short" id="kpi-water-short">&#8212;</div>
@@ -143,19 +138,21 @@
       <div class="kpi-meta">Demand: <strong id="kpi-water-demand">&#8212;</strong></div>
       <div class="kpi-meta" id="kpi-water-eff">&#8212;</div>
       <div class="kpi-badge yoy-up" id="kpi-water-yoy">YoY</div>
+      <button class="kpi-more" onclick="showSection('water','Water Charges')">More info &#10140;</button>
     </div>
 
-    <div class="kpi-card kpi-misc" onclick="showSection('gunthewari','Gunthewari')">
+    <div class="kpi-card kpi-misc">
       <div class="kpi-title"> Miscellaneous </div>
       <div class="kpi-full" id="kpi-misc-full">&#8212;</div>
       <div class="kpi-short" id="kpi-misc-short">&#8212;</div>
       <div class="kpi-divider"></div>
-      <div class="kpi-meta">Head Office collections</div>
+      <div class="kpi-meta">7 service categories</div>
       <div class="kpi-meta" id="kpi-misc-eff">&#8212;</div>
       <div class="kpi-badge yoy-up" id="kpi-misc-yoy">YoY</div>
+      <button class="kpi-more" onclick="showSection('misc-health','Health &amp; Medical')">More info &#10140;</button>
     </div>
 
-    <div class="kpi-card kpi-digital" onclick="showSection('digital','Digital Collections')">
+    <div class="kpi-card kpi-digital">
       <div class="kpi-title"> Digital Collections</div>
       <div class="kpi-full" id="kpi-digital-full">&#8212;</div>
       <div class="kpi-short" id="kpi-digital-short">&#8212;</div>
@@ -163,9 +160,10 @@
       <div class="kpi-meta">Online + UPI + NEFT</div>
       <div class="kpi-meta" id="kpi-digital-pct">&#8212;</div>
       <div class="kpi-badge yoy-up">Digital</div>
+      <button class="kpi-more" onclick="showSection('digital','Digital Collections')">More info &#10140;</button>
     </div>
 
-    <div class="kpi-card kpi-outstanding" onclick="showSection('outstanding','Total Outstanding')">
+    <div class="kpi-card kpi-outstanding">
       <div class="kpi-title"> Total Outstanding</div>
       <div class="kpi-full" id="kpi-out-full">&#8212;</div>
       <div class="kpi-short" id="kpi-out-short">&#8212;</div>
@@ -173,6 +171,7 @@
       <div class="kpi-meta">Pending recovery</div>
       <div class="kpi-meta" id="kpi-out-pct">&#8212;</div>
       <div class="kpi-badge yoy-down">Due</div>
+      <button class="kpi-more" onclick="showSection('outstanding','Total Outstanding')">More info &#10140;</button>
     </div>
 
   </div>
@@ -195,21 +194,13 @@
   <div class="stat-strip" id="propStatStrip"></div>
   <div class="toolbar">
     <div class="filters">
-      <label class="filter-label">Zone:</label>
-      <select id="zoneTableFilter" onchange="currentPage=1;displayTable();">
-        <option value="all">All Zones</option>
-        <option value="A-1">A-1</option><option value="B-5">B-5</option>
-        <option value="C-3">C-3</option><option value="D-9">D-9</option>
-        <option value="E-6">E-6</option><option value="F-7">F-7</option>
-        <option value="G-2">G-2</option><option value="H-4">H-4 (Zone 4-H — Real Data)</option>
-        <option value="I-8">I-8</option><option value="J-10">J-10</option>
-      </select>
-      <label class="filter-label">From:</label>
+      <label class="filter-label">Filter transactions by date:</label>
       <input type="date" id="fromDate">
       <label class="filter-label">To:</label>
       <input type="date" id="toDate">
       <button class="btn-primary" onclick="applyFilters()">Apply</button>
       <button class="btn-secondary" onclick="clearFilters()">Clear</button>
+      <span class="filter-hint">⚠ Filters the transaction table only. Charts show full FY data.</span>
     </div>
     <div class="mode-filter" id="propertyModeFilter">
       <span class="mode-label">Mode:</span>
@@ -221,12 +212,30 @@
   </div>
   <div class="grid">
     <div class="chart-box full-width h300"><canvas id="propertyDemandCollectionChart"></canvas></div>
+    <div class="chart-box h250"><canvas id="propCountZoneChart"></canvas></div>
     <div class="chart-box h250"><canvas id="propertyPie"></canvas></div>
     <div class="chart-box h250"><canvas id="outstandingChart"></canvas></div>
     <div class="chart-box h250"><canvas id="propertyMoM"></canvas></div>
     <div class="chart-box h250"><canvas id="propertyYoY"></canvas></div>
   </div>
   <div class="table-wrapper">
+    <div class="table-filters">
+      <select id="tblZoneFilter" onchange="currentPage=1;displayTable();">
+        <option value="all">All Zones</option>
+        <option>A-1</option><option>B-5</option><option>C-3</option><option>D-9</option>
+        <option>E-6</option><option>F-7</option><option>G-2</option><option>H-4</option>
+        <option>I-8</option><option>J-10</option>
+      </select>
+      <select id="tblModeFilter" onchange="currentPage=1;displayTable();">
+        <option value="all">All Modes</option>
+        <option>Online</option><option>Cash</option><option>Cheque</option>
+      </select>
+      <select id="tblStatusFilter" onchange="currentPage=1;displayTable();">
+        <option value="all">All Status</option>
+        <option>Paid</option><option>Pending</option>
+      </select>
+      <input type="text" id="tblSearch" placeholder="Search owner / ID..." oninput="currentPage=1;displayTable();" style="padding:5px 8px;border:1px solid #d0d7de;border-radius:6px;font-size:.82rem;width:180px;">
+    </div>
     <table id="dataTable">
       <thead>
         <tr>
@@ -279,21 +288,20 @@
   </div>
   <div class="grid">
     <div class="chart-box full-width h300"><canvas id="waterDemandCollectionChart"></canvas></div>
+    <div class="chart-box h250"><canvas id="waterConnCountChart"></canvas></div>
     <div class="chart-box h250"><canvas id="waterPie"></canvas></div>
     <div class="chart-box h250"><canvas id="waterMoM"></canvas></div>
     <div class="chart-box h250"><canvas id="waterYoY"></canvas></div>
   </div>
 </div>
 
-<!-- ===== MISC SECTIONS (Head Office) â€” one template per service ===== -->
-<div id="gunthewari"  class="section misc-section" data-key="gunthewari"></div>
-<div id="building"    class="section misc-section" data-key="building"></div>
-<div id="betterment"  class="section misc-section" data-key="betterment"></div>
-<div id="tanker"      class="section misc-section" data-key="tanker"></div>
-<div id="newwater"    class="section misc-section" data-key="newwater"></div>
-<div id="health"      class="section misc-section" data-key="health"></div>
-<div id="fire"        class="section misc-section" data-key="fire"></div>
-<div id="license"     class="section misc-section" data-key="license"></div>
+<!-- ===== MISC SECTIONS — 6 categories (Head Office) ===== -->
+<div id="misc-health"     class="section misc-section" data-key="misc-health"></div>
+<div id="misc-civic"      class="section misc-section" data-key="misc-civic"></div>
+<div id="misc-urban"      class="section misc-section" data-key="misc-urban"></div>
+<div id="misc-sanitation" class="section misc-section" data-key="misc-sanitation"></div>
+<div id="misc-safety"     class="section misc-section" data-key="misc-safety"></div>
+<div id="misc-water"      class="section misc-section" data-key="misc-water"></div>
 
 <!-- ===== RTS COLLECTIONS ===== -->
 <div id="rts" class="section">
@@ -306,7 +314,7 @@
   <div class="data-source-banner">
     <span class="ds-icon"></span>
     <div>
-      <strong>Sample / Rate-Chart Data — Live Backend Not Yet Connected</strong><br>
+      <!-- <strong>Sample / Rate-Chart Data — Live Backend Not Yet Connected</strong><br> -->
       <span>Transaction counts shown are from the Rate Chart document provided. Resolved/Pending figures are illustrative estimates.</span>
     </div>
     <div class="ds-schema">
@@ -375,9 +383,10 @@
   </div>
   <div class="stat-strip" id="outStatStrip"></div>
   <div class="grid">
-    <div class="chart-box full-width h300"><canvas id="outZoneBar"></canvas></div>
-    <div class="chart-box h280"><canvas id="outHeadBar"></canvas></div>
+    <div class="chart-box full-width h320"><canvas id="outZoneBar"></canvas></div>
+    <div class="chart-box full-width h300"><canvas id="outZoneRanked"></canvas></div>
     <div class="chart-box h280"><canvas id="outPie"></canvas></div>
+    <div class="chart-box h280"><canvas id="outEffChart"></canvas></div>
   </div>
 </div>
 
@@ -483,6 +492,12 @@
 <script src="script.js"></script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 

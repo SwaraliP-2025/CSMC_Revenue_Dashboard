@@ -94,6 +94,21 @@ body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;display
 .kpi-digital{background:linear-gradient(160deg,#2d1b6e,#5a3db8);}
 .kpi-outstanding{background:linear-gradient(160deg,#7a1020,#c0202e);cursor:default;}
 
+/* More info footer on KPI cards */
+.kpi-more{
+  margin-top:auto;padding-top:8px;
+  border:none;border-top:1px solid rgba(255,255,255,.2);
+  background:rgba(0,0,0,.15);border-radius:0 0 10px 10px;
+  font-size:.75rem;font-weight:600;text-align:center;
+  color:#fff;cursor:pointer;width:100%;
+  padding:8px 0 4px;
+  opacity:.85;letter-spacing:.3px;
+  -webkit-transition:background .15s,opacity .15s;
+  -o-transition:background .15s,opacity .15s;
+  transition:background .15s,opacity .15s;
+}
+.kpi-more:hover{background:rgba(0,0,0,.28);opacity:1;}
+
 /* ===== TOOLBAR ===== */
 .toolbar{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:10px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;margin-bottom:10px;background:#fff;padding:10px 14px;border-radius:10px;-webkit-box-shadow:0 1px 4px rgba(0,0,0,.07);box-shadow:0 1px 4px rgba(0,0,0,.07);}
 .filters{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:8px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
@@ -103,6 +118,7 @@ input,select{padding:5px 8px;border:1px solid #d0d7de;border-radius:6px;font-siz
 .btn-secondary{padding:5px 14px;background:#eef2f5;color:#444;border:1px solid #ccc;border-radius:6px;cursor:pointer;font-size:.82rem;-webkit-transition:background .2s;-o-transition:background .2s;transition:background .2s;}
 .btn-secondary:hover{background:#dde3ea;}
 .filter-label{font-size:.8rem;color:#555;font-weight:600;white-space:nowrap;}
+.filter-hint{font-size:.72rem;color:#888;font-style:italic;white-space:nowrap;}
 
 /* ===== MODE FILTER ===== */
 .mode-filter{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:6px;}
@@ -125,6 +141,7 @@ input,select{padding:5px 8px;border:1px solid #d0d7de;border-radius:6px;font-siz
 
 /* ===== TABLE ===== */
 .table-wrapper{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:14px;}
+.table-filters{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;gap:8px;padding:10px 0 8px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
 table{width:100%;min-width:500px;background:#fff;border-collapse:collapse;border-radius:10px;overflow:hidden;-webkit-box-shadow:0 2px 8px rgba(0,0,0,.07);box-shadow:0 2px 8px rgba(0,0,0,.07);}
 th,td{padding:8px 12px;border-bottom:1px solid #eef0f3;text-align:left;font-size:.82rem;white-space:nowrap;}
 th{background:#0d2137;color:#c8d8e8;font-weight:600;font-size:.75rem;letter-spacing:.4px;text-transform:uppercase;}
@@ -236,3 +253,15 @@ th[title]:hover::after{
 .rpt-btn:hover{background:#0d2137;}
 .report-footer{font-size:.75rem;color:#888;margin-top:8px;}
 tfoot td{font-weight:700;background:#f0f4f8;color:#0d2137;padding:8px 12px;border-top:2px solid #dde3ea;}
+
+/* ===== MISC SUB-SERVICES LIST ===== */
+.misc-sub-services{background:#f8fafc;border:1px solid #dde3ea;border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.misc-sub-title{padding:10px 14px;font-size:.82rem;font-weight:700;color:#1a3a5c;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+.misc-sub-title:hover{background:#eef2f5;}
+.misc-sub-list{display:none;margin:0;padding:0 14px 12px 28px;list-style:disc;}
+.misc-sub-list.open{display:block;}
+.misc-sub-list li{font-size:.8rem;color:#444;padding:3px 0;border-bottom:1px solid #eef0f3;}
+.misc-sub-list li:last-child{border-bottom:none;}
+
+/* ===== OUTSTANDING PRIORITY TABLE ===== */
+.out-priority-header{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;gap:12px;margin:18px 0 6px;font-weight:700;color:#0d2137;font-size:.95rem;-ms-flex-wrap:wrap;flex-wrap:wrap;}

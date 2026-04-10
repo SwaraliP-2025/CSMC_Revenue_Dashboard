@@ -59,33 +59,50 @@ function fmt(l){ return l >= 100 ? '\u20b9'+(l/100).toFixed(2)+' Cr' : '\u20b9'+
 var MONTHS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
 var WARDS  = ["A-1","B-5","C-3","D-9","E-6","F-7","G-2","H-4","I-8","J-10"];
 
-/* =============================================
-   FY DATA STORE
-   FY_DATA["2025-26"] = current year
-   FY_DATA["2024-25"] = previous year
-   ============================================= */
 var activeFY = "2025-26";
 
 var FY_DATA = {
   "2025-26": {
     propDemand:  [25,40,12,32,18,27,30,17,38,10],
     propColl:    { online:[10,18,5,14,8,12,13,7,17,4], cash:[6,10,3,8,4,6,7,4,10,2], cheque:[4,7,2,6,3,4,5,3,6,2] },
-    propMoM:     [38,35,32,22,20,18,19,17,16,15,14,13],
+    propMoM:     [3500,3200,2900,2100,1900,1750,1800,1650,1550,1450,1350,1200],
     waterDemand: [7,10,4,8,5,9,8,6,9,3],
     waterColl:   { online:[2,4,1,3,2,3,3,2,3,1], cash:[2,3,1,2,1,3,2,2,3,1], cheque:[1,1,1,1,1,1,1,1,1,0] },
-    waterMoM:    [9,8,7,5,4,4,3,3,3,3,2,2],
+    waterMoM:    [850,780,700,480,360,340,320,290,270,260,230,210],
     misc: {
-      gunthewari:  { label:"Gunthewari",           icon:"", color:"#5a3db8", demand:[12,14,11,15,13,16,14,17,15,18,16,20], online:[4,5,4,5,5,6,5,6,6,7,6,8],   cash:[4,5,3,5,4,5,4,6,5,6,5,7],   cheque:[2,2,2,3,2,3,3,3,2,3,3,3] },
-      building:    { label:"Building Permission",  icon:"", color:"#0d4f8a", demand:[20,22,18,24,21,26,23,28,25,30,27,32], online:[7,8,6,9,8,10,8,10,9,11,10,12], cash:[6,7,6,8,7,9,8,10,9,10,9,11], cheque:[4,4,4,5,4,5,5,6,5,7,6,7] },
-      betterment:  { label:"Betterment Charges",   icon:"", color:"#0a6b3a", demand:[8,9,7,10,8,11,9,12,10,13,11,14],     online:[2,3,2,3,3,4,3,4,4,5,4,5],   cash:[3,3,2,3,2,3,3,4,3,4,3,5],   cheque:[1,1,1,2,1,2,1,2,1,2,2,2] },
-      tanker:      { label:"Tanker Bhade",         icon:"", color:"#7a5200", demand:[5,6,5,7,6,7,6,8,7,8,7,9],           online:[1,2,1,2,2,2,2,3,2,3,2,3],   cash:[2,2,2,3,2,3,2,3,3,3,3,4],   cheque:[1,1,1,1,1,1,1,1,1,1,1,1] },
-      newwater:    { label:"New Water Connection", icon:"", color:"#1a7fc4", demand:[6,7,5,8,6,8,7,9,8,10,9,11],         online:[2,3,2,3,2,3,3,4,3,4,3,5],   cash:[2,2,1,2,2,2,2,3,2,3,3,3],   cheque:[1,1,1,1,1,1,1,1,1,1,1,1] },
-      health:      { label:"Health & Sewerage",    icon:"", color:"#c0202e", demand:[10,11,9,12,10,13,11,14,12,15,13,16], online:[3,4,3,4,3,5,4,5,4,6,5,6],   cash:[3,3,3,4,3,4,3,5,4,5,4,6],   cheque:[2,2,1,2,2,2,2,2,2,2,2,2] },
-      fire:        { label:"Fire NOC",             icon:"", color:"#c0202e", demand:[8,9,7,10,8,11,9,12,10,13,11,14],     online:[3,4,3,4,4,5,4,5,5,6,5,7],   cash:[2,2,2,3,2,3,3,3,3,3,3,3],   cheque:[1,1,1,1,1,1,1,2,1,2,2,2] },
-      license:     { label:"Trade License",        icon:"", color:"#c98a00", demand:[18,20,17,22,19,24,21,26,23,28,25,30], online:[7,8,7,9,8,10,9,11,10,12,11,13], cash:[5,6,4,6,5,7,6,8,7,8,7,9], cheque:[3,3,3,4,3,4,3,4,3,5,4,5] }
+      "misc-health":    { label:"Health & Medical (OPD)",      icon:"", color:"#c0202e",
+        demand:[18,20,17,22,19,24,21,26,23,28,25,30],
+        online:[ 6, 7, 6, 8, 7, 9, 8,10, 9,11,10,12],
+        cash:  [ 8, 9, 7,10, 8,11, 9,12,10,13,11,14],
+        cheque:[ 2, 2, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3] },
+      "misc-civic":     { label:"Public & Civic Amenities",    icon:"", color:"#1a7fc4",
+        demand:[12,14,11,15,13,16,14,17,15,18,16,20],
+        online:[ 4, 5, 4, 5, 5, 6, 5, 6, 6, 7, 6, 8],
+        cash:  [ 4, 5, 3, 5, 4, 5, 4, 6, 5, 6, 5, 7],
+        cheque:[ 2, 2, 2, 3, 2, 3, 3, 3, 2, 3, 3, 3] },
+      "misc-urban":     { label:"Urban Development & Planning",icon:"", color:"#0d4f8a",
+        demand:[25,28,22,30,26,32,28,35,31,37,33,40],
+        online:[ 8, 9, 7,10, 9,11, 9,12,10,13,11,14],
+        cash:  [ 9,10, 8,11, 9,12,10,13,11,14,12,15],
+        cheque:[ 4, 5, 4, 5, 4, 5, 5, 6, 5, 6, 5, 7] },
+      "misc-sanitation":{ label:"Sanitation & Environment",    icon:"",       color:"#0a6b3a",
+        demand:[10,11, 9,12,10,13,11,14,12,15,13,16],
+        online:[ 3, 4, 3, 4, 3, 5, 4, 5, 4, 6, 5, 6],
+        cash:  [ 4, 4, 3, 5, 4, 5, 4, 5, 5, 6, 5, 6],
+        cheque:[ 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 2, 2] },
+      "misc-safety":    { label:"Public Safety & Licensing",   icon:"", color:"#7a5200",
+        demand:[15,17,14,19,16,20,18,22,19,23,21,25],
+        online:[ 5, 6, 5, 7, 5, 7, 6, 8, 7, 8, 7, 9],
+        cash:  [ 6, 7, 5, 7, 6, 8, 7, 9, 7, 9, 8,10],
+        cheque:[ 2, 2, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3] },
+      "misc-water":     { label:"Water & Infrastructure",      icon:"", color:"#2d1b6e",
+        demand:[20,22,18,24,21,26,23,28,25,30,27,32],
+        online:[ 7, 8, 6, 9, 7,10, 8,10, 9,11,10,12],
+        cash:  [ 7, 8, 6, 8, 7, 9, 8,10, 9,10, 9,11],
+        cheque:[ 3, 3, 3, 4, 3, 4, 4, 5, 4, 5, 4, 5] }
     }
   },
-    "2024-25": {
+  "2024-25": {
     // Real figures from CSMC dashboard as on 31-Mar-2025
     // Property Total: Rs.2,13,39,09,648 = 21339 L (zone-wise from bar chart)
     // Water Total:    Rs.22,80,32,144   =  2280 L (zone-wise from bar chart)
@@ -105,46 +122,36 @@ var FY_DATA = {
     },
     waterMoM: [800, 700, 600, 400, 300, 300, 300, 200, 200, 200, 200, 200],
     misc: {
-      gunthewari: { label:"Gunthewari",           icon:"\uD83D\uDDFA", color:"#5a3db8",
-        demand:[600,700,550,750,650,800,700,850,750,900,800,1000],
-        online:[200,233,183,250,217,267,233,283,250,300,267,333],
-        cash:  [200,233,183,250,217,267,233,283,250,300,267,333],
-        cheque:[100,117, 92,125,108,133,117,142,125,150,133,167] },
-      building: { label:"Building Permission",    icon:"\uD83C\uDFD7", color:"#0d4f8a",
-        demand:[1200,1350,1100,1500,1300,1600,1400,1700,1500,1800,1600,2000],
-        online:[ 400, 450, 367, 500, 433, 533, 467, 567, 500, 600, 533, 667],
-        cash:  [ 400, 450, 367, 500, 433, 533, 467, 567, 500, 600, 533, 667],
-        cheque:[ 200, 225, 183, 250, 217, 267, 233, 283, 250, 300, 267, 333] },
-      betterment: { label:"Betterment Charges",   icon:"\uD83D\uDCC8", color:"#0a6b3a",
-        demand:[400,450,367,500,433,533,467,567,500,600,533,667],
-        online:[133,150,122,167,144,178,156,189,167,200,178,222],
-        cash:  [133,150,122,167,144,178,156,189,167,200,178,222],
-        cheque:[ 67, 75, 61, 83, 72, 89, 78, 94, 83,100, 89,111] },
-      tanker: { label:"Tanker Bhade",             icon:"\uD83D\uDE9B", color:"#7a5200",
-        demand:[250,280,230,310,270,330,290,350,310,370,330,410],
-        online:[ 83, 93, 77,103, 90,110, 97,117,103,123,110,137],
-        cash:  [ 83, 93, 77,103, 90,110, 97,117,103,123,110,137],
-        cheque:[ 42, 47, 38, 52, 45, 55, 48, 58, 52, 62, 55, 68] },
-      newwater: { label:"New Water Connection",   icon:"\uD83D\uDD27", color:"#1a7fc4",
-        demand:[300,340,275,375,325,400,350,425,375,450,400,500],
-        online:[100,113, 92,125,108,133,117,142,125,150,133,167],
-        cash:  [100,113, 92,125,108,133,117,142,125,150,133,167],
-        cheque:[ 50, 57, 46, 63, 54, 67, 58, 71, 63, 75, 67, 83] },
-      health: { label:"Health & Sewerage",        icon:"\uD83C\uDFE5", color:"#c0202e",
-        demand:[500,560,458,625,542,667,583,708,625,750,667,833],
-        online:[167,187,153,208,181,222,194,236,208,250,222,278],
-        cash:  [167,187,153,208,181,222,194,236,208,250,222,278],
-        cheque:[ 83, 93, 77,104, 90,111, 97,118,104,125,111,139] },
-      fire: { label:"Fire NOC",                   icon:"\uD83D\uDD25", color:"#c0202e",
-        demand:[350,395,322,438,380,468,408,497,438,525,468,583],
-        online:[117,132,107,146,127,156,136,166,146,175,156,194],
-        cash:  [117,132,107,146,127,156,136,166,146,175,156,194],
-        cheque:[ 58, 66, 54, 73, 63, 78, 68, 83, 73, 88, 78, 97] },
-      license: { label:"Trade License",           icon:"\uD83D\uDCC4", color:"#c98a00",
-        demand:[ 900,1010, 825,1125, 975,1200,1050,1275,1125,1350,1200,1500],
-        online:[ 300, 337, 275, 375, 325, 400, 350, 425, 375, 450, 400, 500],
-        cash:  [ 300, 337, 275, 375, 325, 400, 350, 425, 375, 450, 400, 500],
-        cheque:[ 150, 168, 138, 188, 163, 200, 175, 213, 188, 225, 200, 250] }
+      "misc-health":    { label:"Health & Medical (OPD)",      icon:"", color:"#c0202e",
+        demand:[16,18,15,20,17,22,19,24,21,26,23,28],
+        online:[ 5, 6, 5, 7, 6, 8, 7, 9, 8,10, 9,11],
+        cash:  [ 7, 8, 6, 9, 7,10, 8,11, 9,12,10,13],
+        cheque:[ 2, 2, 2, 2, 2, 2, 2, 3, 2, 3, 2, 3] },
+      "misc-civic":     { label:"Public & Civic Amenities",    icon:"", color:"#1a7fc4",
+        demand:[10,12, 9,13,11,14,12,15,13,16,14,18],
+        online:[ 3, 4, 3, 4, 4, 5, 4, 5, 5, 6, 5, 7],
+        cash:  [ 3, 4, 3, 4, 3, 4, 3, 5, 4, 5, 4, 6],
+        cheque:[ 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] },
+      "misc-urban":     { label:"Urban Development & Planning",icon:"", color:"#0d4f8a",
+        demand:[22,25,20,27,23,29,25,31,28,33,30,36],
+        online:[ 7, 8, 6, 9, 8,10, 8,11, 9,12,10,13],
+        cash:  [ 8, 9, 7,10, 8,11, 9,12,10,13,11,14],
+        cheque:[ 3, 4, 3, 4, 3, 4, 4, 5, 4, 5, 4, 6] },
+      "misc-sanitation":{ label:"Sanitation & Environment",    icon:"",       color:"#0a6b3a",
+        demand:[ 9,10, 8,11, 9,12,10,13,11,14,12,15],
+        online:[ 3, 3, 2, 3, 3, 4, 3, 4, 3, 5, 4, 5],
+        cash:  [ 3, 4, 3, 4, 3, 4, 3, 5, 4, 5, 4, 5],
+        cheque:[ 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2] },
+      "misc-safety":    { label:"Public Safety & Licensing",   icon:"", color:"#7a5200",
+        demand:[13,15,12,17,14,18,16,20,17,21,19,23],
+        online:[ 4, 5, 4, 6, 5, 6, 5, 7, 6, 7, 6, 8],
+        cash:  [ 5, 6, 4, 6, 5, 7, 6, 8, 6, 8, 7, 9],
+        cheque:[ 2, 2, 2, 2, 2, 2, 2, 3, 2, 3, 2, 3] },
+      "misc-water":     { label:"Water & Infrastructure",      icon:"", color:"#2d1b6e",
+        demand:[18,20,16,22,19,24,21,26,23,28,25,30],
+        online:[ 6, 7, 5, 8, 6, 9, 7, 9, 8,10, 9,11],
+        cash:  [ 6, 7, 5, 7, 6, 8, 7, 9, 8, 9, 8,10],
+        cheque:[ 3, 3, 2, 3, 3, 3, 3, 4, 3, 4, 3, 4] }
     }
   }
 };
@@ -222,7 +229,7 @@ function updateKPIs(fy) {
   var prevLabel = fy === "2025-26" ? "FY 2024-25" : "FY 2023-24";
 
   // Update all section FY labels at once
-  document.getElementById("overviewMeta").innerHTML = "FY "+fy+" &nbsp;|&nbsp; All figures in \u20b9 Lakhs";
+  document.getElementById("overviewMeta").innerHTML = "FY "+fy+" &nbsp;";
   document.querySelectorAll(".fy-meta").forEach(function(el){
     var suffix = el.getAttribute("data-suffix") || "";
     el.textContent = suffix + " | FY " + fy;
@@ -259,436 +266,26 @@ function makeStatStrip(id, pills) {
     return '<div class="stat-pill"><div class="stat-pill-label">'+p.label+'</div><div class="stat-pill-value">'+p.value+'</div>'+(p.sub?'<div class="stat-pill-sub">'+p.sub+'</div>':'')+'</div>';
   }).join('');
 }
-function refreshStatStrips(fy) {
-  var pl = fy === "2025-26" ? "FY 2024-25" : "FY 2023-24";
-  makeStatStrip("propStatStrip",[
-    {label:"Total Demand",  value:fmtFull(propDemandTotal), sub:fmt(propDemandTotal)},
-    {label:"Collected",     value:fmtFull(propTotal),       sub:fmt(propTotal)},
-    {label:"Outstanding",   value:fmtFull(propOutstanding), sub:fmt(propOutstanding)},
-    {label:"Efficiency",    value:pct(propTotal,propDemandTotal)+"%"},
-    {label:"Online",        value:fmtFull(propOnline),      sub:pct(propOnline,propTotal)+"% of coll."},
-    {label:"Cash",          value:fmtFull(sum(propColl.cash))},
-    {label:"Cheque",        value:fmtFull(sum(propColl.cheque))},
-    {label:"vs "+pl,        value:(propTotal>propTotal_prev?"+":"")+pct(propTotal-propTotal_prev,propTotal_prev)+"%"}
-  ]);
-  makeStatStrip("waterStatStrip",[
-    {label:"Total Demand",  value:fmtFull(waterDemandTotal), sub:fmt(waterDemandTotal)},
-    {label:"Collected",     value:fmtFull(waterTotal),       sub:fmt(waterTotal)},
-    {label:"Outstanding",   value:fmtFull(waterOutstanding), sub:fmt(waterOutstanding)},
-    {label:"Efficiency",    value:pct(waterTotal,waterDemandTotal)+"%"},
-    {label:"Online",        value:fmtFull(waterOnline),      sub:pct(waterOnline,waterTotal)+"% of coll."},
-    {label:"Cash",          value:fmtFull(sum(waterColl.cash))},
-    {label:"Cheque",        value:fmtFull(sum(waterColl.cheque))},
-    {label:"vs "+pl,        value:(waterTotal>waterTotal_prev?"+":"")+pct(waterTotal-waterTotal_prev,waterTotal_prev)+"%"}
-  ]);
-}
-function buildMiscSection(key) {
-  var s=miscServices[key], tot=sum(s.all), dem=sum(s.demand), out=dem-tot;
-  var on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
-  var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
-  var prevTot = prevFYData ? sum(prevFYData.misc[key].all) : Math.round(tot*0.83);
-  var pl = activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24";
-  var el = document.getElementById(key);
-  el.innerHTML =
-    '<div class="section-header"><h2>'+s.icon+' '+s.label+'</h2><div class="section-meta">Head Office | FY '+activeFY+'</div></div>'
-    +'<div class="data-source-banner">'
-      +'<span class="ds-icon">⚠️</span>'
-      +'<div>'
-        +'<strong>Sample Data — Backend Not Yet Connected</strong><br>'
-        +'<span>Figures shown are illustrative. Once backend is connected, this section will pull from the actual collection register.</span>'
-      +'</div>'
-      +'<div class="ds-schema">'
-        +'<strong>Expected Backend Columns:</strong> '
-        +'Receipt No. &nbsp;|&nbsp; Applicant Name &nbsp;|&nbsp; Service Type &nbsp;|&nbsp; Fee Amount (₹) &nbsp;|&nbsp; Payment Mode &nbsp;|&nbsp; Payment Date &nbsp;|&nbsp; Transaction ID &nbsp;|&nbsp; Status'
-      +'</div>'
-    +'</div>'
-    +'<p class="section-note">Collected centrally at Head Office. No fixed demand — revenue varies by usage of service.</p>'
-    +'<div class="misc-head-cards">'
-      +'<div class="misc-head-card green"><div class="misc-head-card-label">Total Collected</div><div class="misc-head-card-value">'+fmtFull(tot)+'</div><div class="misc-head-card-sub">'+fmt(tot)+'</div></div>'
-      +'<div class="misc-head-card"><div class="misc-head-card-label">Online</div><div class="misc-head-card-value">'+fmtFull(on)+'</div><div class="misc-head-card-sub">'+fmt(on)+' | '+pct(on,tot)+'% digital</div></div>'
-      +'<div class="misc-head-card amber"><div class="misc-head-card-label">Cash</div><div class="misc-head-card-value">'+fmtFull(ca)+'</div><div class="misc-head-card-sub">'+fmt(ca)+' | '+pct(ca,tot)+'%</div></div>'
-      +'<div class="misc-head-card"><div class="misc-head-card-label">Cheque</div><div class="misc-head-card-value">'+fmtFull(ch)+'</div><div class="misc-head-card-sub">'+fmt(ch)+' | '+pct(ch,tot)+'%</div></div>'
-      +'<div class="misc-head-card green"><div class="misc-head-card-label">vs '+pl+'</div><div class="misc-head-card-value">'+(tot>prevTot?"+":"")+pct(tot-prevTot,prevTot)+'%</div><div class="misc-head-card-sub">Year-on-Year</div></div>'
-    +'</div>'
-    +'<div class="toolbar">'
-    +'<div class="filters">'
-      +'<label class="filter-label">From:</label>'
-      +'<input type="date" id="'+key+'FromDate">'
-      +'<label class="filter-label">To:</label>'
-      +'<input type="date" id="'+key+'ToDate">'
-      +'<button class="btn-primary" onclick="applyDateFilter(\''+key+'\')">Apply</button>'
-      +'<button class="btn-secondary" onclick="clearDateFilter(\''+key+'\')">Clear</button>'
-    +'</div>'
-    +'<div class="mode-filter" id="'+key+'ModeFilter">'
-      +'<span class="mode-label">Mode:</span>'
-      +'<button class="mode-btn active" onclick="setMode(\''+key+'\',\'all\',this)">All</button>'
-      +'<button class="mode-btn online" onclick="setMode(\''+key+'\',\'online\',this)">Online</button>'
-      +'<button class="mode-btn cash" onclick="setMode(\''+key+'\',\'cash\',this)">Cash</button>'
-      +'<button class="mode-btn cheque" onclick="setMode(\''+key+'\',\'cheque\',this)">Cheque</button>'
-    +'</div>'
-    +'</div>'
-    +'<div class="grid">'
-      +'<div class="chart-box full-width h300"><canvas id="'+key+'BarChart"></canvas></div>'
-      +'<div class="chart-box h250"><canvas id="'+key+'ModePie"></canvas></div>'
-      +'<div class="chart-box h250"><canvas id="'+key+'YoYChart"></canvas></div>'
-    +'</div>';
-}
-function buildAllMiscSections(){ Object.keys(miscServices).forEach(buildMiscSection); }
-buildAllMiscSections();
-/* ===== CHART HELPERS ===== */
-var charts = {};
-function buildBarDS(dem, coll, mode) {
-  var colors={all:'rgba(40,167,100,.85)',online:'rgba(26,111,168,.85)',cash:'rgba(26,170,92,.85)',cheque:'rgba(201,138,0,.9)'};
-  var labels={all:'Collection (All)',online:'Online',cash:'Cash',cheque:'Cheque'};
-  return [{label:'Demand (Rs.L)',data:dem,backgroundColor:'rgba(180,190,200,.55)'},{label:labels[mode]+' (Rs.L)',data:coll,backgroundColor:colors[mode]}];
-}
-var barOpts=function(t){return{
-  responsive:true,maintainAspectRatio:false,
-  plugins:{
-    legend:{position:'top'},
-    title:{display:true,text:t,font:{size:13}},
-    tooltip:{callbacks:{
-      footer:function(items){
-        var ds = items[0] && items[0].dataset.label || '';
-        if(ds.indexOf('Collection')>-1) return 'Collection = Online + Cash + Cheque';
-        if(ds.indexOf('Outstanding')>-1) return 'Outstanding = Demand − Collection';
-        if(ds.indexOf('Demand')>-1) return 'Demand = Arrears + Current + Penalty − Rebate';
-        return '';
-      }
-    }}
-  },
-  scales:{x:{stacked:false},y:{beginAtZero:true,title:{display:true,text:'Rs. Lakhs'}}}
-};};
 
-var pieOpts=function(t){return{
-  responsive:true,maintainAspectRatio:false,
-  plugins:{
-    legend:{position:'bottom'},
-    title:{display:true,text:t,font:{size:12}},
-    tooltip:{callbacks:{
-      label:function(item){
-        var total = item.dataset.data.reduce(function(a,b){return a+b;},0);
-        var pct   = total ? Math.round(item.parsed/total*100) : 0;
-        return ' '+item.label+': Rs.'+item.parsed.toLocaleString('en-IN')+' L ('+pct+'%)';
-      },
-      footer:function(items){
-        var lbl = items[0] && items[0].label || '';
-        if(lbl==='Online') return 'Digital payments via portal/UPI/NEFT';
-        if(lbl==='Cash')   return 'Physical cash at collection counter';
-        if(lbl==='Cheque') return 'Cheque deposited at office';
-        if(lbl==='Outstanding') return 'Outstanding = Total Demand − Total Collection';
-        return '';
-      }
-    }}
-  }
-};};
-
-var lineOpts=function(t){return{
-  responsive:true,maintainAspectRatio:false,
-  plugins:{
-    legend:{position:'top'},
-    title:{display:true,text:t,font:{size:13}},
-    tooltip:{callbacks:{
-      footer:function(items){
-        return 'Monthly total = sum of all zone collections for that month';
-      }
-    }}
-  },
-  scales:{y:{beginAtZero:true,title:{display:true,text:'Rs. Lakhs'}}}
-};};
-
-function setMode(section, mode, btn) {
-  var container = document.getElementById(section+'ModeFilter');
-  container.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  var s = miscServices[section] || null;
-  var dem  = s ? s.demand : (section==='property' ? propDemand : waterDemand);
-  var coll = s ? s        : (section==='property' ? propColl   : waterColl);
-  charts[section].data.datasets = buildBarDS(dem, coll[mode], mode);
-  charts[section].update();
-}
-
-function getPrevFYLabel() { return activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24"; }
-function getCurrFYLabel() { return "FY "+activeFY; }
-
-function getPrevMiscAll(key) {
-  var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
-  return prevFYData ? prevFYData.misc[key].all : miscServices[key].all.map(function(v){ return Math.round(v*0.83); });
-}
-function getPrevPropMoM() { return propMoM_prev; }
-function getPrevWaterMoM() { return waterMoM_prev; }
 /* =============================================
-   RTS SERVICES DATA (from Rate Chart)
+   PROPERTY COUNT ZONE-WISE (real data from dashboard)
+   Total: 3,37,497 properties
    ============================================= */
-var RTS_SERVICES = [
-  // Health Department
-  {dept:'Health',       service:'Birth Certificate',          fee:'₹70–150',  feeType:'paid', txn:34252},
-  {dept:'Health',       service:'Death Certificate',          fee:'₹70–150',  feeType:'paid', txn:5050},
-  {dept:'Health',       service:'Marriage Certificate',       fee:'₹170',     feeType:'paid', txn:1011},
-  {dept:'Health',       service:'Registration Nursing Home',  fee:'₹12,000',  feeType:'paid', txn:30},
-  {dept:'Health',       service:'Renewal of Nursing Home',    fee:'₹600',     feeType:'paid', txn:32},
-  {dept:'Health',       service:'Bio-Medical Waste Disposal', fee:'₹510',     feeType:'paid', txn:142},
-  {dept:'Health',       service:'MTP Registration',           fee:'Free',     feeType:'free', txn:46},
-  // Animal Husbandry
-  {dept:'Animal Husbandry', service:'New Pet License',        fee:'₹750',     feeType:'paid', txn:667},
-  {dept:'Animal Husbandry', service:'Renewal of Pet License', fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'Animal Husbandry', service:'NOC for Meat Shop',      fee:'₹1,500/yr',feeType:'paid', txn:0},
-  {dept:'Animal Husbandry', service:'Renewal NOC Meat Shop',  fee:'₹1,500',   feeType:'paid', txn:0},
-  // Drainage
-  {dept:'Drainage',     service:'New Drainage Connection',    fee:'Admin rate',feeType:'paid', txn:13},
-  // Garden
-  {dept:'Garden',       service:'Trimming of Trees',          fee:'Free',     feeType:'free', txn:69},
-  {dept:'Garden',       service:'Felling of Tree',            fee:'Free',     feeType:'free', txn:51},
-  // Estate
-  {dept:'Estate',       service:'Booking of Ground',          fee:'₹15K–35K/day',feeType:'paid', txn:0},
-  {dept:'Estate',       service:'Permission for Hoarding',    fee:'₹500/day', feeType:'paid', txn:9},
-  // Property Tax
-  {dept:'Property Tax', service:'Transfer of Property',       fee:'₹4,500–9,000',feeType:'paid', txn:79},
-  {dept:'Property Tax', service:'New Assessment of Property', fee:'Free',     feeType:'free', txn:43},
-  {dept:'Property Tax', service:'Exemption in Property Tax',  fee:'Free',     feeType:'free', txn:10},
-  {dept:'Property Tax', service:'Extract of Property',        fee:'₹100',     feeType:'paid', txn:159},
-  {dept:'Property Tax', service:'Re-Assessment of Property',  fee:'Free',     feeType:'free', txn:2},
-  {dept:'Property Tax', service:'7-Star Application',         fee:'Free',     feeType:'free', txn:0},
-  {dept:'Property Tax', service:'No-Dues Certificate',        fee:'Free',     feeType:'free', txn:0},
-  {dept:'Property Tax', service:'Self Assessment',            fee:'Varies',   feeType:'paid', txn:0},
-  // Water Tax
-  {dept:'Water Tax',    service:'Change of Ownership',        fee:'₹1,100',   feeType:'paid', txn:70},
-  {dept:'Water Tax',    service:'New Water Connection',       fee:'Varies',   feeType:'paid', txn:1},
-  {dept:'Water Tax',    service:'Water Reconnection',         fee:'Free',     feeType:'free', txn:14},
-  {dept:'Water Tax',    service:'Change in Usage',            fee:'Free',     feeType:'free', txn:9},
-  {dept:'Water Tax',    service:'Change in Connection Size',  fee:'Free',     feeType:'free', txn:8},
-  {dept:'Water Tax',    service:'New Plumber License',        fee:'Varies',   feeType:'paid', txn:4},
-  {dept:'Water Tax',    service:'Renewal Plumber License',    fee:'Varies',   feeType:'paid', txn:14},
-  // Town Planning
-  {dept:'Town Planning',service:'Zone Certificate',           fee:'₹250',     feeType:'paid', txn:113},
-  {dept:'Town Planning',service:'Refund of Security Deposit', fee:'Varies',   feeType:'paid', txn:9},
-  {dept:'Town Planning',service:'Issuance of Part Plan',      fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'Town Planning',service:'Building Commencement Cert.',fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'Town Planning',service:'Plinth Certificate',         fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'Town Planning',service:'Issuance of Occupancy',      fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'Town Planning',service:'Mobile Tower License',       fee:'Varies',   feeType:'paid', txn:0},
-  // Fire
-  {dept:'Fire',         service:'Provisional Fire NOC',       fee:'Admin rate',feeType:'paid', txn:0},
-  {dept:'Fire',         service:'Final Fire NOC',             fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'Fire',         service:'Renewal of Fire NOC',        fee:'Varies',   feeType:'paid', txn:0},
-  // License
-  {dept:'License',      service:'NOC for Trade/Business',     fee:'₹500/copy',feeType:'paid', txn:0},
-  {dept:'License',      service:'New Trade License',          fee:'₹100–30,000',feeType:'paid', txn:0},
-  {dept:'License',      service:'Trade License Name Change',  fee:'₹50–15,000',feeType:'paid', txn:0},
-  {dept:'License',      service:'Trade License Type Change',  fee:'₹50–15,000',feeType:'paid', txn:0},
-  {dept:'License',      service:'Trade License Duplicate',    fee:'₹100',     feeType:'paid', txn:0},
-  {dept:'License',      service:'Owner/Partner Change',       fee:'₹1,000',   feeType:'paid', txn:11},
-  {dept:'License',      service:'Trade License Cancellation', fee:'₹500',     feeType:'paid', txn:1},
-  {dept:'License',      service:'Owner Name Change',          fee:'₹1,000',   feeType:'paid', txn:0},
-  {dept:'License',      service:'Partner Count Update',       fee:'₹1,000',   feeType:'paid', txn:0},
-  {dept:'License',      service:'Trade License Renewal',      fee:'₹50–30,000',feeType:'paid', txn:0},
-  {dept:'License',      service:'Outdated Renewal Notice',    fee:'₹50–30,000',feeType:'paid', txn:0},
-  {dept:'License',      service:'Trade License Auto Renewal', fee:'₹50–30,000',feeType:'paid', txn:0},
-  {dept:'License',      service:'NOC for Mandap',             fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'License',      service:'Licensing of Lodging House', fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'License',      service:'Renewal Lodging House',      fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'License',      service:'Licensing Wedding Halls',    fee:'Varies',   feeType:'paid', txn:0},
-  {dept:'License',      service:'Renewal Wedding Halls',      fee:'Varies',   feeType:'paid', txn:0},
-  // Electrical
-  {dept:'Electrical',   service:'Light Pole Complaint',       fee:'Free',     feeType:'free', txn:0},
-  // NULM
-  {dept:'NULM',         service:'Hawkers License',            fee:'Varies',   feeType:'paid', txn:10}
-];
+var PROP_COUNT_ZONE = [39200, 45500, 21600, 30800, 37500, 42500, 23700, 34900, 42200, 18100];
+// Total = 336,000 — adjust last zone to hit exact 337,497
+PROP_COUNT_ZONE[9] = 337497 - PROP_COUNT_ZONE.slice(0,9).reduce(function(a,b){return a+b;},0);
 
-// Assign simulated resolved/pending per service based on txn count
-RTS_SERVICES.forEach(function(s){
-  var t = s.txn || 0;
-  var compRate = 0.85 + Math.random()*0.13; // 85–98%
-  s.resolved = Math.round(t * compRate);
-  s.pending  = t - s.resolved;
-  s.compliance = t > 0 ? Math.round(s.resolved/t*100) : 0;
+/* Water connections zone-wise (estimated proportional to water demand) */
+var WATER_CONN_ZONE = waterDemand.map(function(d){
+  return Math.round((d / sum(waterDemand)) * 185000);
 });
-
-var RTS_DEPTS = ['All','Health','Animal Husbandry','Drainage','Garden','Estate','Property Tax','Water Tax','Town Planning','Fire','License','Electrical','NULM'];
-
-var activeDept = 'All';
-
-function buildRTSModule() {
-  // Stat strip
-  var totalTxn      = RTS_SERVICES.reduce(function(a,s){ return a+s.txn; }, 0);
-  var totalResolved = RTS_SERVICES.reduce(function(a,s){ return a+s.resolved; }, 0);
-  var totalPending  = RTS_SERVICES.reduce(function(a,s){ return a+s.pending; }, 0);
-  var feeServices   = RTS_SERVICES.filter(function(s){ return s.feeType==='paid'; }).length;
-  var freeServices  = RTS_SERVICES.filter(function(s){ return s.feeType==='free'; }).length;
-  makeStatStrip('rtsStatStrip',[
-    {label:'Total Services',    value: RTS_SERVICES.length+'',    sub:'across 10 depts'},
-    {label:'Total Transactions',value: totalTxn.toLocaleString('en-IN'), sub:'Annual'},
-    {label:'Resolved (RTS)',    value: totalResolved.toLocaleString('en-IN'), sub: Math.round(totalResolved/totalTxn*100)+'% compliance'},
-    {label:'Pending',           value: totalPending.toLocaleString('en-IN')},
-    {label:'Fee-based Services',value: feeServices+''},
-    {label:'Free Services',     value: freeServices+''}
-  ]);
-
-  // Department tabs
-  var tabsEl = document.getElementById('rtsDeptTabs');
-  tabsEl.innerHTML = RTS_DEPTS.map(function(d){
-    return '<button class="rts-tab'+(d==='All'?' active':'')+'" onclick="filterRTSDept(\''+d+'\')">'+d+'</button>';
-  }).join('');
-
-  // Monthly chart
-  var rtsRec = [320,290,310,280,300,270,290,260,280,250,270,240];
-  var rtsRes = rtsRec.map(function(v){ return Math.round(v*0.91); });
-  var rtsPend= rtsRec.map(function(v,i){ return v-rtsRes[i]; });
-  if(charts.rts) charts.rts.destroy();
-  charts.rts = new Chart(document.getElementById('rtsMonthlyChart'),{
-    type:'bar',
-    data:{labels:MONTHS, datasets:[
-      {label:'Applications Received', data:rtsRec, backgroundColor:'rgba(26,127,196,.7)'},
-      {label:'Resolved within RTS',   data:rtsRes, backgroundColor:'rgba(26,170,92,.8)'},
-      {label:'Pending / Delayed',     data:rtsPend,backgroundColor:'rgba(192,32,46,.7)'}
-    ]},
-    options: barOpts('RTS — Monthly Applications: Received vs Resolved vs Pending ('+getCurrFYLabel()+')')
-  });
-
-  // Dept-wise bar
-  var depts = RTS_DEPTS.slice(1);
-  var deptTxn = depts.map(function(d){
-    return RTS_SERVICES.filter(function(s){ return s.dept===d; }).reduce(function(a,s){ return a+s.txn; },0);
-  });
-  var deptRes = depts.map(function(d){
-    return RTS_SERVICES.filter(function(s){ return s.dept===d; }).reduce(function(a,s){ return a+s.resolved; },0);
-  });
-  if(charts.rtsDept) charts.rtsDept.destroy();
-  charts.rtsDept = new Chart(document.getElementById('rtsDeptBar'),{
-    type:'bar',
-    data:{labels:depts, datasets:[
-      {label:'Transactions', data:deptTxn, backgroundColor:'rgba(26,127,196,.7)'},
-      {label:'Resolved',     data:deptRes, backgroundColor:'rgba(26,170,92,.8)'}
-    ]},
-    options: barOpts('Department-wise Transactions & Resolution')
-  });
-
-  // Status pie
-  if(charts.rtsStatus) charts.rtsStatus.destroy();
-  charts.rtsStatus = new Chart(document.getElementById('rtsStatusPie'),{
-    type:'doughnut',
-    data:{labels:['Resolved in Time','Pending'],
-      datasets:[{data:[totalResolved, totalPending], backgroundColor:['#1aaa5c','#c0202e']}]},
-    options: pieOpts('Overall RTS Status — All Departments')
-  });
-
-  // Fee vs Free pie
-  var feeCount  = RTS_SERVICES.filter(function(s){ return s.feeType==='paid'; }).length;
-  var freeCount = RTS_SERVICES.filter(function(s){ return s.feeType==='free'; }).length;
-  if(charts.rtsFee) charts.rtsFee.destroy();
-  charts.rtsFee = new Chart(document.getElementById('rtsFeeVsFree'),{
-    type:'doughnut',
-    data:{labels:['Fee-based','Free Services'],
-      datasets:[{data:[feeCount, freeCount], backgroundColor:['#1a7fc4','#1aaa5c']}]},
-    options: pieOpts('Fee-based vs Free Services ('+RTS_SERVICES.length+' total)')
-  });
-
-  renderRTSTable('All');
-}
-
-function filterRTSDept(dept) {
-  activeDept = dept;
-  document.querySelectorAll('.rts-tab').forEach(function(b){ b.classList.remove('active'); });
-  document.querySelectorAll('.rts-tab').forEach(function(b){
-    if(b.textContent === dept) b.classList.add('active');
-  });
-  renderRTSTable(dept);
-}
-
-function renderRTSTable(dept) {
-  var filtered = dept === 'All' ? RTS_SERVICES : RTS_SERVICES.filter(function(s){ return s.dept===dept; });
-  document.getElementById('rtsDeptTitle').textContent = dept === 'All' ? 'All Departments' : dept+' Department';
-  document.getElementById('rtsServiceCount').textContent = filtered.length+' services';
-  var tbody = document.getElementById('rtsTableBody');
-  tbody.innerHTML = filtered.map(function(s, i){
-    var compClass = s.compliance >= 90 ? 'compliance-high' : s.compliance >= 75 ? 'compliance-mid' : 'compliance-low';
-    var feeBadge  = s.feeType==='paid'
-      ? '<span class="fee-badge">'+s.fee+'</span>'
-      : '<span class="free-badge">Free</span>';
-    return '<tr>'
-      +'<td>'+(i+1)+'</td>'
-      +'<td>'+s.dept+'</td>'
-      +'<td>'+s.service+'</td>'
-      +'<td>'+feeBadge+'</td>'
-      +'<td>'+(s.txn > 0 ? s.txn.toLocaleString('en-IN') : '—')+'</td>'
-      +'<td>'+(s.txn > 0 ? s.resolved.toLocaleString('en-IN') : '—')+'</td>'
-      +'<td>'+(s.txn > 0 ? s.pending : '—')+'</td>'
-      +'<td>'+(s.txn > 0 ? '<span class="'+compClass+'">'+s.compliance+'%</span>' : '—')+'</td>'
-      +'</tr>';
-  }).join('');
-}
-
-/* ===== OUTSTANDING SECTION ===== */
-function buildOutstandingCharts() {
-  // Zone-wise outstanding: property + water per zone
-  var propOut  = propDemand.map(function(v,i){ return v - propColl.all[i]; });
-  var waterOut = waterDemand.map(function(v,i){ return v - waterColl.all[i]; });
-
-  // Misc outstanding per head
-  var miscHeadLabels = [], miscHeadOut = [], miscHeadColors = [];
-  Object.keys(miscServices).forEach(function(k){
-    var s = miscServices[k];
-    miscHeadLabels.push(s.label);
-    miscHeadOut.push(sum(s.all));   // collection total, not outstanding
-    miscHeadColors.push(s.color);
-  });
-
-  // Stat strip
-  makeStatStrip('outStatStrip', [
-    {label:'Property Outstanding',  value: fmtFull(propOutstanding),  sub: fmt(propOutstanding)},
-    {label:'Water Outstanding',     value: fmtFull(waterOutstanding), sub: fmt(waterOutstanding)},
-    {label:'Total Outstanding',     value: fmtFull(totalOutstanding), sub: fmt(totalOutstanding)},
-    {label:'% of Demand',           value: pct(totalOutstanding, grandDemand)+'%'},
-    // {label:'Note',                  value: 'Misc excluded', sub: 'No fixed demand'}
-  ]);
-
-  // Zone bar: property + water outstanding side by side
-  if(charts.outZoneBar) charts.outZoneBar.destroy();
-  charts.outZoneBar = new Chart(document.getElementById('outZoneBar'), {
-    type: 'bar',
-    data: {
-      labels: WARDS,
-      datasets: [
-        { label: 'Property Outstanding (Rs.L)', data: propOut,  backgroundColor: 'rgba(192,32,46,.8)' },
-        { label: 'Water Outstanding (Rs.L)',    data: waterOut, backgroundColor: 'rgba(201,138,0,.8)' }
-      ]
-    },
-    options: barOpts('Zone-wise Outstanding — Property & Water (' + getCurrFYLabel() + ')')
-  });
-
-  // Misc collection per head (not outstanding — no fixed demand)
-  if(charts.outHeadBar) charts.outHeadBar.destroy();
-  charts.outHeadBar = new Chart(document.getElementById('outHeadBar'), {
-    type: 'bar',
-    data: {
-      labels: miscHeadLabels,
-      datasets: [{ label: 'Collected (Rs.L)', data: miscHeadOut, backgroundColor: miscHeadColors }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, title: { display: true, text: 'Misc Collection by Service Head — (No fixed demand, usage-based)', font: { size: 13 } } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: 'Rs. Lakhs' } } }
-    }
-  });
-
-  // Overall pie
-  if(charts.outPie) charts.outPie.destroy();
-  charts.outPie = new Chart(document.getElementById('outPie'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Property', 'Water'],
-      datasets: [{ data: [propOutstanding, waterOutstanding], backgroundColor: ['#c0202e', '#c98a00'] }]
-    },
-    options: pieOpts('Outstanding Split — Property vs Water (Rs.L)')
-  });
-}
 
 /* ===== CREATE ALL CHARTS ===== */
 function createCharts() {
   var miscMonthly = MONTHS.map(function(m,i){
     var t=0; Object.keys(miscServices).forEach(function(k){ t+=miscServices[k].all[i]; }); return t;
   });
-  var miscLabels=[],miscVals=[],miscColors=['#5a3db8','#0d4f8a','#0a6b3a','#7a5200','#1a7fc4','#c0202e','#c0202e','#c98a00'];
+  var miscLabels=[],miscVals=[],miscColors=['#c0202e','#1a7fc4','#0d4f8a','#0a6b3a','#7a5200','#2d1b6e','#555e6e'];
   Object.keys(miscServices).forEach(function(k){ miscLabels.push(miscServices[k].label); miscVals.push(sum(miscServices[k].all)); });
 
   charts.overviewZone = new Chart(document.getElementById('overviewZoneChart'),{type:'bar',data:{labels:WARDS,datasets:[
@@ -711,6 +308,27 @@ function createCharts() {
     {label:getCurrFYLabel(),data:propMoM.map(function(v,i){return v+waterMoM[i];}),backgroundColor:'rgba(26,127,196,.8)'}
   ]},options:barOpts('Year-on-Year Comparison — Property + Water (Rs. Lakhs)')});
 
+  /* PROPERTY COUNT ZONE-WISE */
+  var propCountTotal = PROP_COUNT_ZONE.reduce(function(a,b){return a+b;},0);
+  charts.propCount = new Chart(document.getElementById('propCountZoneChart'),{
+    type:'bar',
+    data:{ labels:WARDS, datasets:[{
+      label:'Property Count',
+      data: PROP_COUNT_ZONE,
+      backgroundColor:'rgba(26,170,92,.8)',
+      borderRadius:4
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top'},
+        title:{display:true, text:'Property Total Count Ward-wise : '+propCountTotal.toLocaleString('en-IN'), font:{size:13}}
+      },
+      scales:{y:{beginAtZero:false, title:{display:true,text:'Property Count'}}}
+    }
+  });
+
+  /* PROPERTY DEMAND vs COLLECTION */
   charts.property = new Chart(document.getElementById('propertyDemandCollectionChart'),{type:'bar',data:{labels:WARDS,datasets:buildBarDS(propDemand,propColl.all,'all')},options:barOpts('Property Tax: Demand vs Collection per Zone — '+getCurrFYLabel())});
   charts.propPie = new Chart(document.getElementById('propertyPie'),{type:'doughnut',data:{labels:['Online','Cash','Cheque','Outstanding'],datasets:[{data:[propOnline,sum(propColl.cash),sum(propColl.cheque),propOutstanding],backgroundColor:['#1a7fc4','#1aaa5c','#c98a00','#c0202e']}]},options:pieOpts('Property — Payment Mode Split (Rs.L) — '+getCurrFYLabel())});
   charts.propOut = new Chart(document.getElementById('outstandingChart'),{type:'bar',data:{labels:WARDS,datasets:[{label:'Outstanding (Rs.L)',data:propDemand.map(function(v,i){return v-propColl.all[i];}),backgroundColor:'rgba(192,32,46,.7)'}]},options:barOpts('Property — Outstanding per Zone')});
@@ -723,6 +341,27 @@ function createCharts() {
     {label:getCurrFYLabel(),data:propMoM,backgroundColor:'rgba(26,127,196,.8)'}
   ]},options:barOpts('Property — Year-on-Year Monthly (Rs.L)')});
 
+  /* WATER CONNECTION COUNT ZONE-WISE */
+  var waterConnTotal = WATER_CONN_ZONE.reduce(function(a,b){return a+b;},0);
+  charts.waterConn = new Chart(document.getElementById('waterConnCountChart'),{
+    type:'bar',
+    data:{ labels:WARDS, datasets:[{
+      label:'Water Connections',
+      data: WATER_CONN_ZONE,
+      backgroundColor:'rgba(23,162,184,.8)',
+      borderRadius:4
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top'},
+        title:{display:true, text:'Water Connections Count Zone-wise : '+waterConnTotal.toLocaleString('en-IN'), font:{size:13}}
+      },
+      scales:{y:{beginAtZero:false, title:{display:true,text:'Connection Count'}}}
+    }
+  });
+
+  /* WATER DEMAND vs COLLECTION */
   charts.water = new Chart(document.getElementById('waterDemandCollectionChart'),{type:'bar',data:{labels:WARDS,datasets:buildBarDS(waterDemand,waterColl.all,'all')},options:barOpts('Water Charges: Demand vs Collection per Zone — '+getCurrFYLabel())});
   charts.waterPie = new Chart(document.getElementById('waterPie'),{type:'doughnut',data:{labels:['Online','Cash','Cheque','Outstanding'],datasets:[{data:[waterOnline,sum(waterColl.cash),sum(waterColl.cheque),waterOutstanding],backgroundColor:['#1a7fc4','#1aaa5c','#c98a00','#c0202e']}]},options:pieOpts('Water — Payment Mode Split (Rs.L) — '+getCurrFYLabel())});
   charts.waterMoM = new Chart(document.getElementById('waterMoM'),{type:'line',data:{labels:MONTHS,datasets:[
@@ -905,13 +544,18 @@ function displayTable(fromDate, toDate) {
   if(!tbody) return;
   tbody.innerHTML = '';
 
-  var zoneFilter = document.getElementById('zoneTableFilter');
-  var selectedZone = zoneFilter ? zoneFilter.value : 'all';
-
   var filtered = tableData.filter(function(d){
-    var zoneOk = selectedZone === 'all' || d.zone === selectedZone;
-    var dateOk = (!fromDate || !toDate) || (d.date >= fromDate && d.date <= toDate);
-    return zoneOk && dateOk;
+    var dateOk   = (!fromDate || !toDate) || (d.date >= fromDate && d.date <= toDate);
+    var zoneEl   = document.getElementById('tblZoneFilter');
+    var modeEl   = document.getElementById('tblModeFilter');
+    var statusEl = document.getElementById('tblStatusFilter');
+    var searchEl = document.getElementById('tblSearch');
+    var zoneOk   = !zoneEl   || zoneEl.value   === 'all' || d.zone   === zoneEl.value;
+    var modeOk   = !modeEl   || modeEl.value   === 'all' || d.mode   === modeEl.value;
+    var statusOk = !statusEl || statusEl.value === 'all' || d.status === statusEl.value;
+    var search   = searchEl ? searchEl.value.toLowerCase() : '';
+    var searchOk = !search || d.owner.toLowerCase().indexOf(search) > -1 || d.id.toLowerCase().indexOf(search) > -1;
+    return dateOk && zoneOk && modeOk && statusOk && searchOk;
   });
 
   var start = (currentPage - 1) * rowsPerPage;
@@ -961,28 +605,30 @@ function applyFilters() {
   currentPage = 1;
   var fromVal = document.getElementById('fromDate').value;
   var toVal   = document.getElementById('toDate').value;
-
   if(!fromVal || !toVal) { alert("Please select both From and To dates."); return; }
   var from = new Date(fromVal);
   var to   = new Date(toVal); to.setHours(23,59,59);
   if(from > to) { alert("From date must be before To date."); return; }
 
-  // Filter monthly chart to overlapping months
-  var filteredIdx = MONTHS.reduce(function(acc, m, i){
-    var mStart = monthIndexToDate(i);
-    var mEnd   = new Date(mStart); mEnd.setMonth(mEnd.getMonth()+1); mEnd.setDate(0);
-    if(mStart <= to && mEnd >= from) acc.push(i);
-    return acc;
-  }, []);
+  // Find months overlapping the date range
+  var idx = getMonthsInRange(from, to);
 
-  if(filteredIdx.length === 0) { alert("No data in selected range for FY "+activeFY+"."); return; }
-
-  var fl = filteredIdx.map(function(i){ return MONTHS[i]; });
-  if(charts.propMoM) {
-    charts.propMoM.data.labels = fl;
-    charts.propMoM.data.datasets[0].data = filteredIdx.map(function(i){ return propMoM[i]; });
-    if(charts.propMoM.data.datasets[1]) charts.propMoM.data.datasets[1].data = filteredIdx.map(function(i){ return propMoM_prev[i]; });
-    charts.propMoM.update();
+  if(idx.length > 0) {
+    var fl = idx.map(function(i){ return MONTHS[i]; });
+    // Update property demand vs collection bar chart
+    if(charts.property) {
+      charts.property.data.labels = fl;
+      charts.property.data.datasets[0].data = idx.map(function(i){ return Math.round(propDemand[i % propDemand.length] * (idx.length/12)); });
+      charts.property.data.datasets[1].data = idx.map(function(i){ return Math.round(propColl.all[i % propColl.all.length] * (idx.length/12)); });
+      charts.property.update();
+    }
+    // Update MoM chart
+    if(charts.propMoM) {
+      charts.propMoM.data.labels = fl;
+      charts.propMoM.data.datasets[0].data = idx.map(function(i){ return propMoM[i]; });
+      if(charts.propMoM.data.datasets[1]) charts.propMoM.data.datasets[1].data = idx.map(function(i){ return propMoM_prev[i]; });
+      charts.propMoM.update();
+    }
   }
 
   displayTable(from, to);
@@ -991,17 +637,38 @@ function applyFilters() {
 function clearFilters() {
   document.getElementById('fromDate').value = '';
   document.getElementById('toDate').value   = '';
+  // Restore full year on all property charts
+  if(charts.property) {
+    charts.property.data.labels = WARDS;
+    charts.property.data.datasets = buildBarDS(propDemand, propColl.all, 'all');
+    charts.property.update();
+  }
   if(charts.propMoM) {
     charts.propMoM.data.labels = MONTHS;
     charts.propMoM.data.datasets[0].data = propMoM;
     if(charts.propMoM.data.datasets[1]) charts.propMoM.data.datasets[1].data = propMoM_prev;
     charts.propMoM.update();
   }
+  // Also clear table filters
+  var zf = document.getElementById('tblZoneFilter'); if(zf) zf.value = 'all';
+  var mf = document.getElementById('tblModeFilter'); if(mf) mf.value = 'all';
+  var sf = document.getElementById('tblSearch');     if(sf) sf.value = '';
   currentPage = 1;
   displayTable();
 }
 
-/* Generic date filter for water + misc sections */
+/* Helper: get month indices overlapping a date range */
+function getMonthsInRange(from, to) {
+  return MONTHS.reduce(function(acc, m, i){
+    var mStart = monthIndexToDate(i);
+    var mEnd   = new Date(mStart); mEnd.setMonth(mEnd.getMonth()+1); mEnd.setDate(0);
+    if(mStart <= to && mEnd >= from) acc.push(i);
+    return acc;
+  }, []);
+}
+
+/* Generic date filter for water + misc sections — see full implementation above in applyDateFilter */
+
 function applyDateFilter(section) {
   var fromVal = document.getElementById(section+'FromDate').value;
   var toVal   = document.getElementById(section+'ToDate').value;
@@ -1010,51 +677,77 @@ function applyDateFilter(section) {
   var to   = new Date(toVal); to.setHours(23,59,59);
   if(from > to) { alert("From date must be before To date."); return; }
 
-  var filteredIdx = MONTHS.reduce(function(acc, m, i){
-    var mStart = monthIndexToDate(i);
-    var mEnd   = new Date(mStart); mEnd.setMonth(mEnd.getMonth()+1); mEnd.setDate(0);
-    if(mStart <= to && mEnd >= from) acc.push(i);
-    return acc;
-  }, []);
+  var idx = getMonthsInRange(from, to);
+  if(idx.length === 0) return;
+  var fl = idx.map(function(i){ return MONTHS[i]; });
 
-  if(filteredIdx.length === 0) { alert("No data in selected range for FY "+activeFY+"."); return; }
-
-  var fl = filteredIdx.map(function(i){ return MONTHS[i]; });
-
-  // water MoM chart
-  if(section === 'water' && charts.waterMoM) {
-    charts.waterMoM.data.labels = fl;
-    charts.waterMoM.data.datasets[0].data = filteredIdx.map(function(i){ return waterMoM[i]; });
-    if(charts.waterMoM.data.datasets[1]) charts.waterMoM.data.datasets[1].data = filteredIdx.map(function(i){ return waterMoM_prev[i]; });
-    charts.waterMoM.update();
+  // Water section
+  if(section === 'water') {
+    if(charts.water) {
+      charts.water.data.labels = fl;
+      charts.water.data.datasets[0].data = idx.map(function(i){ return waterDemand[i % waterDemand.length]; });
+      charts.water.data.datasets[1].data = idx.map(function(i){ return waterColl.all[i % waterColl.all.length]; });
+      charts.water.update();
+    }
+    if(charts.waterMoM) {
+      charts.waterMoM.data.labels = fl;
+      charts.waterMoM.data.datasets[0].data = idx.map(function(i){ return waterMoM[i]; });
+      if(charts.waterMoM.data.datasets[1]) charts.waterMoM.data.datasets[1].data = idx.map(function(i){ return waterMoM_prev[i]; });
+      charts.waterMoM.update();
+    }
+    return;
   }
 
-  // misc bar chart
+  // Misc sections — bar chart uses MONTHS labels with stacked online/cash/cheque
   if(miscServices[section] && charts[section]) {
     var s = miscServices[section];
     charts[section].data.labels = fl;
-    charts[section].data.datasets[0].data = filteredIdx.map(function(i){ return s.demand[i]; });
-    charts[section].data.datasets[1].data = filteredIdx.map(function(i){ return s.all[i]; });
+    var ds = charts[section].data.datasets;
+    if(ds.length >= 3) {
+      ds[0].data = idx.map(function(i){ return s.online[i]; });
+      ds[1].data = idx.map(function(i){ return s.cash[i]; });
+      ds[2].data = idx.map(function(i){ return s.cheque[i]; });
+    } else {
+      ds[0].data = idx.map(function(i){ return s.demand[i]; });
+      ds[1].data = idx.map(function(i){ return s.all[i]; });
+    }
     charts[section].update();
   }
 }
 
 function clearDateFilter(section) {
-  document.getElementById(section+'FromDate').value = '';
-  document.getElementById(section+'ToDate').value   = '';
+  var fromEl = document.getElementById(section+'FromDate');
+  var toEl   = document.getElementById(section+'ToDate');
+  if(fromEl) fromEl.value = '';
+  if(toEl)   toEl.value   = '';
 
-  if(section === 'water' && charts.waterMoM) {
-    charts.waterMoM.data.labels = MONTHS;
-    charts.waterMoM.data.datasets[0].data = waterMoM;
-    if(charts.waterMoM.data.datasets[1]) charts.waterMoM.data.datasets[1].data = waterMoM_prev;
-    charts.waterMoM.update();
+  if(section === 'water') {
+    if(charts.water) {
+      charts.water.data.labels = WARDS;
+      charts.water.data.datasets = buildBarDS(waterDemand, waterColl.all, 'all');
+      charts.water.update();
+    }
+    if(charts.waterMoM) {
+      charts.waterMoM.data.labels = MONTHS;
+      charts.waterMoM.data.datasets[0].data = waterMoM;
+      if(charts.waterMoM.data.datasets[1]) charts.waterMoM.data.datasets[1].data = waterMoM_prev;
+      charts.waterMoM.update();
+    }
+    return;
   }
 
   if(miscServices[section] && charts[section]) {
     var s = miscServices[section];
     charts[section].data.labels = MONTHS;
-    charts[section].data.datasets[0].data = s.demand;
-    charts[section].data.datasets[1].data = s.all;
+    var ds = charts[section].data.datasets;
+    if(ds.length >= 3) {
+      ds[0].data = s.online;
+      ds[1].data = s.cash;
+      ds[2].data = s.cheque;
+    } else {
+      ds[0].data = s.demand;
+      ds[1].data = s.all;
+    }
     charts[section].update();
   }
 }
@@ -1254,3 +947,7 @@ function printReport(panelId) {
 }
 
 buildReports();
+
+
+
+
