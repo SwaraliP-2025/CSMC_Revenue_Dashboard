@@ -266,6 +266,560 @@ function makeStatStrip(id, pills) {
     return '<div class="stat-pill"><div class="stat-pill-label">'+p.label+'</div><div class="stat-pill-value">'+p.value+'</div>'+(p.sub?'<div class="stat-pill-sub">'+p.sub+'</div>':'')+'</div>';
   }).join('');
 }
+function refreshStatStrips(fy) {
+  var pl = fy === "2025-26" ? "FY 2024-25" : "FY 2023-24";
+  makeStatStrip("propStatStrip",[
+    {label:"Total Demand",  value:fmtFull(propDemandTotal), sub:fmt(propDemandTotal)},
+    {label:"Collected",     value:fmtFull(propTotal),       sub:fmt(propTotal)},
+    {label:"Outstanding",   value:fmtFull(propOutstanding), sub:fmt(propOutstanding)},
+    {label:"Efficiency",    value:pct(propTotal,propDemandTotal)+"%"},
+    {label:"Online",        value:fmtFull(propOnline),      sub:pct(propOnline,propTotal)+"% of coll."},
+    {label:"Cash",          value:fmtFull(sum(propColl.cash))},
+    {label:"Cheque",        value:fmtFull(sum(propColl.cheque))},
+    {label:"vs "+pl,        value:(propTotal>propTotal_prev?"+":"")+pct(propTotal-propTotal_prev,propTotal_prev)+"%"}
+  ]);
+  makeStatStrip("waterStatStrip",[
+    {label:"Total Demand",  value:fmtFull(waterDemandTotal), sub:fmt(waterDemandTotal)},
+    {label:"Collected",     value:fmtFull(waterTotal),       sub:fmt(waterTotal)},
+    {label:"Outstanding",   value:fmtFull(waterOutstanding), sub:fmt(waterOutstanding)},
+    {label:"Efficiency",    value:pct(waterTotal,waterDemandTotal)+"%"},
+    {label:"Online",        value:fmtFull(waterOnline),      sub:pct(waterOnline,waterTotal)+"% of coll."},
+    {label:"Cash",          value:fmtFull(sum(waterColl.cash))},
+    {label:"Cheque",        value:fmtFull(sum(waterColl.cheque))},
+    {label:"vs "+pl,        value:(waterTotal>waterTotal_prev?"+":"")+pct(waterTotal-waterTotal_prev,waterTotal_prev)+"%"}
+  ]);
+}
+/* =============================================
+   MISC SUB-SERVICES per category
+   ============================================= */
+var MISC_SUB_SERVICES = {
+  "misc-health": [
+    "OPD Fees — Shivaji Nagar",
+    "OPD Fees — Satara",
+    "OPD Fees — Saadat Nagar",
+    "OPD Fees — Cidco N-11",
+    "OPD Fees — Cidco N-8",
+    "OPD Fees — Silk Mill Colony",
+    "OPD Fees — Harsh Nagar",
+    "OPD Fees — Harsul",
+    "OPD Fees — Kabir Nagar",
+    "OPD Fees — Jinsi (New)",
+    "OPD Fees — Misarwadi"
+  ],
+  "misc-civic": [
+    "Playground Rent (क्रिडांगन भाडे)",
+    "Theater Rent (नाट्यगृह भाडे)",
+    "Building Rent (इमारत भाडे)",
+    "Land / Stall Rent (जमीन भाडे / टपरी भाडे)",
+    "Swimming Pool Membership Fees (जलतरण तलाव सभासद फी)",
+    "Zoo Entry Fees (प्राणी संग्रहालय प्रवेश फी)",
+    "Aquarium Entry Fees (मत्स्यालय प्रवेश फी)",
+    "Adventure Park Royalty — Chhatrapati Sambhaji Maharaj Adventure Park"
+  ],
+  "misc-urban": [
+    "Gunthewari Development — Recovery & Development Works (वसुली / विकास कामे)",
+    "Building Permission Fees (नगर रचना बांधकाम अनामत)",
+    "Building Regularization Premiums (इमारत नियमितकरण प्रिमीयम)",
+    "Fines for Illegal Construction (बांधकाम परवाना नियमित दंड)"
+  ],
+  "misc-sanitation": [
+    "Solid Waste Management Fines & Fees (नागरी घन कचरा व्‍यवस्‍थापन)",
+    "Bio-Medical Waste Project — Membership & Registration Fees (नोंदणी फी)",
+    "Treated Sewage Water Fees",
+    "Sale of Trees & Flowers (झाडे व फुले विक्री)"
+  ],
+  "misc-safety": [
+    "Fire Call Charges",
+    "Fire Fund (अग्नीशमन निधी)",
+    "Marriage Registration (विवाह नोंदणी)",
+    "Birth & Death Fees (जन्म व मृत्यु फी)",
+    "General License Fees",
+    "Plumber License Fees (Water Supply Department)",
+    "Advertisement / Hoarding Boards (जाहीराती बोर्ड)"
+  ],
+  "misc-water": [
+    "Tanker Charges — Water Sale (पाणी विक्री टॅंकर भाडे)",
+    "New Water Connection Fees (नवीन नळ जोडणी)",
+    "Fines for Water Wastage",
+    "Drainage Connection Fees",
+    "Drainage Line Advance Payments",
+    "Road Construction / Repair Grants (रस्ते बांधणी व दुरुस्ती अनुदान)"
+  ],
+  "misc-admin": [
+    "Tender Forms (टेंडर फोर्म)",
+    "Slaughterhouse Fees / Auctions (कत्तल खाना)",
+    "Cattle Pound Fees (कोंडवाडा फी)",
+    "NA Tax (Non-Agricultural Tax)",
+    "GST — CGST 1% / SGST 1%",
+    "GST — CGST 6% / SGST 6%",
+    "GST — CGST 9% / SGST 9%",
+    "Ambulance & Vehicle Charges"
+  ]
+};
+
+function buildMiscSection(key) {
+  var s=miscServices[key], tot=sum(s.all), dem=sum(s.demand), out=dem-tot;
+  var on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
+  var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
+  var prevTot = prevFYData ? sum(prevFYData.misc[key].all) : Math.round(tot*0.83);
+  var pl = activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24";
+  var subServices = MISC_SUB_SERVICES[key] || [];
+  var el = document.getElementById(key);
+
+  var subList = subServices.length
+    ? '<div class="misc-sub-services">'
+        +'<div class="misc-sub-title" onclick="this.nextElementSibling.classList.toggle(\'open\')">'
+          +'&#9660; Services under this category ('+subServices.length+')'
+        +'</div>'
+        +'<ul class="misc-sub-list">'
+          + subServices.map(function(sv){ return '<li>'+sv+'</li>'; }).join('')
+        +'</ul>'
+      +'</div>'
+    : '';
+
+  el.innerHTML =
+    '<div class="section-header"><h2>'+s.icon+' '+s.label+'</h2>'
+      +'<div class="section-meta fy-meta" data-suffix="Head Office">Head Office | FY '+activeFY+'</div>'
+    +'</div>'
+    +'<p class="section-note">Collected centrally at Head Office. No fixed demand — revenue varies by usage of service.</p>'
+    + subList
+    +'<div class="misc-head-cards">'
+      +'<div class="misc-head-card green"><div class="misc-head-card-label">Total Collected</div><div class="misc-head-card-value">'+fmtFull(tot)+'</div><div class="misc-head-card-sub">'+fmt(tot)+'</div></div>'
+      +'<div class="misc-head-card"><div class="misc-head-card-label">Online</div><div class="misc-head-card-value">'+fmtFull(on)+'</div><div class="misc-head-card-sub">'+fmt(on)+' | '+pct(on,tot)+'% digital</div></div>'
+      +'<div class="misc-head-card amber"><div class="misc-head-card-label">Cash</div><div class="misc-head-card-value">'+fmtFull(ca)+'</div><div class="misc-head-card-sub">'+fmt(ca)+' | '+pct(ca,tot)+'%</div></div>'
+      +'<div class="misc-head-card"><div class="misc-head-card-label">Cheque</div><div class="misc-head-card-value">'+fmtFull(ch)+'</div><div class="misc-head-card-sub">'+fmt(ch)+' | '+pct(ch,tot)+'%</div></div>'
+      +'<div class="misc-head-card green"><div class="misc-head-card-label">vs '+pl+'</div><div class="misc-head-card-value">'+(tot>prevTot?"+":"")+pct(tot-prevTot,prevTot)+'%</div><div class="misc-head-card-sub">Year-on-Year</div></div>'
+    +'</div>'
+    +'<div class="toolbar">'
+      +'<div class="filters">'
+        +'<label class="filter-label">From:</label>'
+        +'<input type="date" id="'+key+'FromDate">'
+        +'<label class="filter-label">To:</label>'
+        +'<input type="date" id="'+key+'ToDate">'
+        +'<button class="btn-primary" onclick="applyDateFilter(\''+key+'\')">Apply</button>'
+        +'<button class="btn-secondary" onclick="clearDateFilter(\''+key+'\')">Clear</button>'
+      +'</div>'
+      +'<div class="mode-filter" id="'+key+'ModeFilter">'
+        +'<span class="mode-label">Mode:</span>'
+        +'<button class="mode-btn active" onclick="setMode(\''+key+'\',\'all\',this)">All</button>'
+        +'<button class="mode-btn online" onclick="setMode(\''+key+'\',\'online\',this)">Online</button>'
+        +'<button class="mode-btn cash" onclick="setMode(\''+key+'\',\'cash\',this)">Cash</button>'
+        +'<button class="mode-btn cheque" onclick="setMode(\''+key+'\',\'cheque\',this)">Cheque</button>'
+      +'</div>'
+    +'</div>'
+    +'<div class="grid">'
+      +'<div class="chart-box full-width h300"><canvas id="'+key+'BarChart"></canvas></div>'
+      +'<div class="chart-box h250"><canvas id="'+key+'ModePie"></canvas></div>'
+      +'<div class="chart-box h250"><canvas id="'+key+'YoYChart"></canvas></div>'
+    +'</div>';
+}
+function buildAllMiscSections(){ Object.keys(miscServices).forEach(buildMiscSection); }
+buildAllMiscSections();
+/* ===== CHART HELPERS ===== */
+var charts = {};
+function buildBarDS(dem, coll, mode) {
+  var colors={all:'rgba(40,167,100,.85)',online:'rgba(26,111,168,.85)',cash:'rgba(26,170,92,.85)',cheque:'rgba(201,138,0,.9)'};
+  var labels={all:'Collection (All)',online:'Online',cash:'Cash',cheque:'Cheque'};
+  return [{label:'Demand (Rs.L)',data:dem,backgroundColor:'rgba(180,190,200,.55)'},{label:labels[mode]+' (Rs.L)',data:coll,backgroundColor:colors[mode]}];
+}
+var barOpts=function(t){return{
+  responsive:true,maintainAspectRatio:false,
+  plugins:{
+    legend:{position:'top'},
+    title:{display:true,text:t,font:{size:13}},
+    tooltip:{callbacks:{
+      footer:function(items){
+        var ds = items[0] && items[0].dataset.label || '';
+        if(ds.indexOf('Collection')>-1) return 'Collection = Online + Cash + Cheque';
+        if(ds.indexOf('Outstanding')>-1) return 'Outstanding = Demand − Collection';
+        if(ds.indexOf('Demand')>-1) return 'Demand = Arrears + Current + Penalty − Rebate';
+        return '';
+      }
+    }}
+  },
+  scales:{x:{stacked:false},y:{beginAtZero:true,title:{display:true,text:'Rs. Lakhs'}}}
+};};
+
+var pieOpts=function(t){return{
+  responsive:true,maintainAspectRatio:false,
+  plugins:{
+    legend:{position:'bottom'},
+    title:{display:true,text:t,font:{size:12}},
+    tooltip:{callbacks:{
+      label:function(item){
+        var total = item.dataset.data.reduce(function(a,b){return a+b;},0);
+        var pct   = total ? Math.round(item.parsed/total*100) : 0;
+        return ' '+item.label+': Rs.'+item.parsed.toLocaleString('en-IN')+' L ('+pct+'%)';
+      },
+      footer:function(items){
+        var lbl = items[0] && items[0].label || '';
+        if(lbl==='Online') return 'Digital payments via portal/UPI/NEFT';
+        if(lbl==='Cash')   return 'Physical cash at collection counter';
+        if(lbl==='Cheque') return 'Cheque deposited at office';
+        if(lbl==='Outstanding') return 'Outstanding = Total Demand − Total Collection';
+        return '';
+      }
+    }}
+  }
+};};
+
+var lineOpts=function(t){return{
+  responsive:true,maintainAspectRatio:false,
+  plugins:{
+    legend:{position:'top'},
+    title:{display:true,text:t,font:{size:13}},
+    tooltip:{callbacks:{
+      footer:function(items){
+        return 'Monthly total = sum of all zone collections for that month';
+      }
+    }}
+  },
+  scales:{y:{beginAtZero:true,title:{display:true,text:'Rs. Lakhs'}}}
+};};
+
+function setMode(section, mode, btn) {
+  var container = document.getElementById(section+'ModeFilter');
+  container.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var s = miscServices[section] || null;
+  var dem  = s ? s.demand : (section==='property' ? propDemand : waterDemand);
+  var coll = s ? s        : (section==='property' ? propColl   : waterColl);
+  charts[section].data.datasets = buildBarDS(dem, coll[mode], mode);
+  charts[section].update();
+}
+
+function getPrevFYLabel() { return activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24"; }
+function getCurrFYLabel() { return "FY "+activeFY; }
+
+function getPrevMiscAll(key) {
+  var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
+  return prevFYData ? prevFYData.misc[key].all : miscServices[key].all.map(function(v){ return Math.round(v*0.83); });
+}
+function getPrevPropMoM() { return propMoM_prev; }
+function getPrevWaterMoM() { return waterMoM_prev; }
+/* =============================================
+   RTS SERVICES DATA (from Rate Chart)
+   ============================================= */
+var RTS_SERVICES = [
+  // Health Department
+  {dept:'Health',       service:'Birth Certificate',          fee:'₹70–150',  feeType:'paid', txn:34252},
+  {dept:'Health',       service:'Death Certificate',          fee:'₹70–150',  feeType:'paid', txn:5050},
+  {dept:'Health',       service:'Marriage Certificate',       fee:'₹170',     feeType:'paid', txn:1011},
+  {dept:'Health',       service:'Registration Nursing Home',  fee:'₹12,000',  feeType:'paid', txn:30},
+  {dept:'Health',       service:'Renewal of Nursing Home',    fee:'₹600',     feeType:'paid', txn:32},
+  {dept:'Health',       service:'Bio-Medical Waste Disposal', fee:'₹510',     feeType:'paid', txn:142},
+  {dept:'Health',       service:'MTP Registration',           fee:'Free',     feeType:'free', txn:46},
+  // Animal Husbandry
+  {dept:'Animal Husbandry', service:'New Pet License',        fee:'₹750',     feeType:'paid', txn:667},
+  {dept:'Animal Husbandry', service:'Renewal of Pet License', fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'Animal Husbandry', service:'NOC for Meat Shop',      fee:'₹1,500/yr',feeType:'paid', txn:0},
+  {dept:'Animal Husbandry', service:'Renewal NOC Meat Shop',  fee:'₹1,500',   feeType:'paid', txn:0},
+  // Drainage
+  {dept:'Drainage',     service:'New Drainage Connection',    fee:'Admin rate',feeType:'paid', txn:13},
+  // Garden
+  {dept:'Garden',       service:'Trimming of Trees',          fee:'Free',     feeType:'free', txn:69},
+  {dept:'Garden',       service:'Felling of Tree',            fee:'Free',     feeType:'free', txn:51},
+  // Estate
+  {dept:'Estate',       service:'Booking of Ground',          fee:'₹15K–35K/day',feeType:'paid', txn:0},
+  {dept:'Estate',       service:'Permission for Hoarding',    fee:'₹500/day', feeType:'paid', txn:9},
+  // Property Tax
+  {dept:'Property Tax', service:'Transfer of Property',       fee:'₹4,500–9,000',feeType:'paid', txn:79},
+  {dept:'Property Tax', service:'New Assessment of Property', fee:'Free',     feeType:'free', txn:43},
+  {dept:'Property Tax', service:'Exemption in Property Tax',  fee:'Free',     feeType:'free', txn:10},
+  {dept:'Property Tax', service:'Extract of Property',        fee:'₹100',     feeType:'paid', txn:159},
+  {dept:'Property Tax', service:'Re-Assessment of Property',  fee:'Free',     feeType:'free', txn:2},
+  {dept:'Property Tax', service:'7-Star Application',         fee:'Free',     feeType:'free', txn:0},
+  {dept:'Property Tax', service:'No-Dues Certificate',        fee:'Free',     feeType:'free', txn:0},
+  {dept:'Property Tax', service:'Self Assessment',            fee:'Varies',   feeType:'paid', txn:0},
+  // Water Tax
+  {dept:'Water Tax',    service:'Change of Ownership',        fee:'₹1,100',   feeType:'paid', txn:70},
+  {dept:'Water Tax',    service:'New Water Connection',       fee:'Varies',   feeType:'paid', txn:1},
+  {dept:'Water Tax',    service:'Water Reconnection',         fee:'Free',     feeType:'free', txn:14},
+  {dept:'Water Tax',    service:'Change in Usage',            fee:'Free',     feeType:'free', txn:9},
+  {dept:'Water Tax',    service:'Change in Connection Size',  fee:'Free',     feeType:'free', txn:8},
+  {dept:'Water Tax',    service:'New Plumber License',        fee:'Varies',   feeType:'paid', txn:4},
+  {dept:'Water Tax',    service:'Renewal Plumber License',    fee:'Varies',   feeType:'paid', txn:14},
+  // Town Planning
+  {dept:'Town Planning',service:'Zone Certificate',           fee:'₹250',     feeType:'paid', txn:113},
+  {dept:'Town Planning',service:'Refund of Security Deposit', fee:'Varies',   feeType:'paid', txn:9},
+  {dept:'Town Planning',service:'Issuance of Part Plan',      fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'Town Planning',service:'Building Commencement Cert.',fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'Town Planning',service:'Plinth Certificate',         fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'Town Planning',service:'Issuance of Occupancy',      fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'Town Planning',service:'Mobile Tower License',       fee:'Varies',   feeType:'paid', txn:0},
+  // Fire
+  {dept:'Fire',         service:'Provisional Fire NOC',       fee:'Admin rate',feeType:'paid', txn:0},
+  {dept:'Fire',         service:'Final Fire NOC',             fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'Fire',         service:'Renewal of Fire NOC',        fee:'Varies',   feeType:'paid', txn:0},
+  // License
+  {dept:'License',      service:'NOC for Trade/Business',     fee:'₹500/copy',feeType:'paid', txn:0},
+  {dept:'License',      service:'New Trade License',          fee:'₹100–30,000',feeType:'paid', txn:0},
+  {dept:'License',      service:'Trade License Name Change',  fee:'₹50–15,000',feeType:'paid', txn:0},
+  {dept:'License',      service:'Trade License Type Change',  fee:'₹50–15,000',feeType:'paid', txn:0},
+  {dept:'License',      service:'Trade License Duplicate',    fee:'₹100',     feeType:'paid', txn:0},
+  {dept:'License',      service:'Owner/Partner Change',       fee:'₹1,000',   feeType:'paid', txn:11},
+  {dept:'License',      service:'Trade License Cancellation', fee:'₹500',     feeType:'paid', txn:1},
+  {dept:'License',      service:'Owner Name Change',          fee:'₹1,000',   feeType:'paid', txn:0},
+  {dept:'License',      service:'Partner Count Update',       fee:'₹1,000',   feeType:'paid', txn:0},
+  {dept:'License',      service:'Trade License Renewal',      fee:'₹50–30,000',feeType:'paid', txn:0},
+  {dept:'License',      service:'Outdated Renewal Notice',    fee:'₹50–30,000',feeType:'paid', txn:0},
+  {dept:'License',      service:'Trade License Auto Renewal', fee:'₹50–30,000',feeType:'paid', txn:0},
+  {dept:'License',      service:'NOC for Mandap',             fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'License',      service:'Licensing of Lodging House', fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'License',      service:'Renewal Lodging House',      fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'License',      service:'Licensing Wedding Halls',    fee:'Varies',   feeType:'paid', txn:0},
+  {dept:'License',      service:'Renewal Wedding Halls',      fee:'Varies',   feeType:'paid', txn:0},
+  // Electrical
+  {dept:'Electrical',   service:'Light Pole Complaint',       fee:'Free',     feeType:'free', txn:0},
+  // NULM
+  {dept:'NULM',         service:'Hawkers License',            fee:'Varies',   feeType:'paid', txn:10}
+];
+
+// Assign simulated resolved/pending per service based on txn count
+RTS_SERVICES.forEach(function(s){
+  var t = s.txn || 0;
+  var compRate = 0.85 + Math.random()*0.13; // 85–98%
+  s.resolved = Math.round(t * compRate);
+  s.pending  = t - s.resolved;
+  s.compliance = t > 0 ? Math.round(s.resolved/t*100) : 0;
+});
+
+var RTS_DEPTS = ['All','Health','Animal Husbandry','Drainage','Garden','Estate','Property Tax','Water Tax','Town Planning','Fire','License','Electrical','NULM'];
+
+var activeDept = 'All';
+
+function buildRTSModule() {
+  // Stat strip
+  var totalTxn      = RTS_SERVICES.reduce(function(a,s){ return a+s.txn; }, 0);
+  var totalResolved = RTS_SERVICES.reduce(function(a,s){ return a+s.resolved; }, 0);
+  var totalPending  = RTS_SERVICES.reduce(function(a,s){ return a+s.pending; }, 0);
+  var feeServices   = RTS_SERVICES.filter(function(s){ return s.feeType==='paid'; }).length;
+  var freeServices  = RTS_SERVICES.filter(function(s){ return s.feeType==='free'; }).length;
+  makeStatStrip('rtsStatStrip',[
+    {label:'Total Services',    value: RTS_SERVICES.length+'',    sub:'across 10 depts'},
+    {label:'Total Transactions',value: totalTxn.toLocaleString('en-IN'), sub:'Annual'},
+    {label:'Resolved (RTS)',    value: totalResolved.toLocaleString('en-IN'), sub: Math.round(totalResolved/totalTxn*100)+'% compliance'},
+    {label:'Pending',           value: totalPending.toLocaleString('en-IN')},
+    {label:'Fee-based Services',value: feeServices+''},
+    {label:'Free Services',     value: freeServices+''}
+  ]);
+
+  // Department tabs
+  var tabsEl = document.getElementById('rtsDeptTabs');
+  tabsEl.innerHTML = RTS_DEPTS.map(function(d){
+    return '<button class="rts-tab'+(d==='All'?' active':'')+'" onclick="filterRTSDept(\''+d+'\')">'+d+'</button>';
+  }).join('');
+
+  // Monthly chart
+  var rtsRec = [320,290,310,280,300,270,290,260,280,250,270,240];
+  var rtsRes = rtsRec.map(function(v){ return Math.round(v*0.91); });
+  var rtsPend= rtsRec.map(function(v,i){ return v-rtsRes[i]; });
+  if(charts.rts) charts.rts.destroy();
+  charts.rts = new Chart(document.getElementById('rtsMonthlyChart'),{
+    type:'bar',
+    data:{labels:MONTHS, datasets:[
+      {label:'Applications Received', data:rtsRec, backgroundColor:'rgba(26,127,196,.7)'},
+      {label:'Resolved within RTS',   data:rtsRes, backgroundColor:'rgba(26,170,92,.8)'},
+      {label:'Pending / Delayed',     data:rtsPend,backgroundColor:'rgba(192,32,46,.7)'}
+    ]},
+    options: barOpts('RTS — Monthly Applications: Received vs Resolved vs Pending ('+getCurrFYLabel()+')')
+  });
+
+  // Dept-wise bar
+  var depts = RTS_DEPTS.slice(1);
+  var deptTxn = depts.map(function(d){
+    return RTS_SERVICES.filter(function(s){ return s.dept===d; }).reduce(function(a,s){ return a+s.txn; },0);
+  });
+  var deptRes = depts.map(function(d){
+    return RTS_SERVICES.filter(function(s){ return s.dept===d; }).reduce(function(a,s){ return a+s.resolved; },0);
+  });
+  if(charts.rtsDept) charts.rtsDept.destroy();
+  charts.rtsDept = new Chart(document.getElementById('rtsDeptBar'),{
+    type:'bar',
+    data:{labels:depts, datasets:[
+      {label:'Transactions', data:deptTxn, backgroundColor:'rgba(26,127,196,.7)'},
+      {label:'Resolved',     data:deptRes, backgroundColor:'rgba(26,170,92,.8)'}
+    ]},
+    options: barOpts('Department-wise Transactions & Resolution')
+  });
+
+  // Status pie
+  if(charts.rtsStatus) charts.rtsStatus.destroy();
+  charts.rtsStatus = new Chart(document.getElementById('rtsStatusPie'),{
+    type:'doughnut',
+    data:{labels:['Resolved in Time','Pending'],
+      datasets:[{data:[totalResolved, totalPending], backgroundColor:['#1aaa5c','#c0202e']}]},
+    options: pieOpts('Overall RTS Status — All Departments')
+  });
+
+  // Fee vs Free pie
+  var feeCount  = RTS_SERVICES.filter(function(s){ return s.feeType==='paid'; }).length;
+  var freeCount = RTS_SERVICES.filter(function(s){ return s.feeType==='free'; }).length;
+  if(charts.rtsFee) charts.rtsFee.destroy();
+  charts.rtsFee = new Chart(document.getElementById('rtsFeeVsFree'),{
+    type:'doughnut',
+    data:{labels:['Fee-based','Free Services'],
+      datasets:[{data:[feeCount, freeCount], backgroundColor:['#1a7fc4','#1aaa5c']}]},
+    options: pieOpts('Fee-based vs Free Services ('+RTS_SERVICES.length+' total)')
+  });
+
+  renderRTSTable('All');
+}
+
+function filterRTSDept(dept) {
+  activeDept = dept;
+  document.querySelectorAll('.rts-tab').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.rts-tab').forEach(function(b){
+    if(b.textContent === dept) b.classList.add('active');
+  });
+  renderRTSTable(dept);
+}
+
+function renderRTSTable(dept) {
+  var filtered = dept === 'All' ? RTS_SERVICES : RTS_SERVICES.filter(function(s){ return s.dept===dept; });
+  document.getElementById('rtsDeptTitle').textContent = dept === 'All' ? 'All Departments' : dept+' Department';
+  document.getElementById('rtsServiceCount').textContent = filtered.length+' services';
+  var tbody = document.getElementById('rtsTableBody');
+  tbody.innerHTML = filtered.map(function(s, i){
+    var compClass = s.compliance >= 90 ? 'compliance-high' : s.compliance >= 75 ? 'compliance-mid' : 'compliance-low';
+    var feeBadge  = s.feeType==='paid'
+      ? '<span class="fee-badge">'+s.fee+'</span>'
+      : '<span class="free-badge">Free</span>';
+    return '<tr>'
+      +'<td>'+(i+1)+'</td>'
+      +'<td>'+s.dept+'</td>'
+      +'<td>'+s.service+'</td>'
+      +'<td>'+feeBadge+'</td>'
+      +'<td>'+(s.txn > 0 ? s.txn.toLocaleString('en-IN') : '—')+'</td>'
+      +'<td>'+(s.txn > 0 ? s.resolved.toLocaleString('en-IN') : '—')+'</td>'
+      +'<td>'+(s.txn > 0 ? s.pending : '—')+'</td>'
+      +'<td>'+(s.txn > 0 ? '<span class="'+compClass+'">'+s.compliance+'%</span>' : '—')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+/* ===== OUTSTANDING SECTION ===== */
+function buildOutstandingCharts() {
+  var propOut  = propDemand.map(function(v,i){ return v - propColl.all[i]; });
+  var waterOut = waterDemand.map(function(v,i){ return v - waterColl.all[i]; });
+  var totalOut = WARDS.map(function(w,i){ return propOut[i] + waterOut[i]; });
+  var collEff  = WARDS.map(function(w,i){
+    var dem = propDemand[i] + waterDemand[i];
+    var col = propColl.all[i] + waterColl.all[i];
+    return dem > 0 ? Math.round(col/dem*100) : 0;
+  });
+
+  // Stat strip
+  makeStatStrip('outStatStrip', [
+    {label:'Property Outstanding',  value: fmtFull(propOutstanding),  sub: fmt(propOutstanding)},
+    {label:'Water Outstanding',     value: fmtFull(waterOutstanding), sub: fmt(waterOutstanding)},
+    {label:'Total Outstanding',     value: fmtFull(totalOutstanding), sub: fmt(totalOutstanding)},
+    {label:'% of Demand',           value: pct(totalOutstanding, grandDemand)+'%'},
+    {label:'Highest Outstanding',   value: WARDS[totalOut.indexOf(Math.max.apply(null,totalOut))], sub: 'Focus zone'},
+    {label:'Lowest Efficiency',     value: WARDS[collEff.indexOf(Math.min.apply(null,collEff))],   sub: pct(Math.min.apply(null,collEff),100)+'% eff.'}
+  ]);
+
+  // Chart 1: Zone bar — property + water outstanding side by side
+  if(charts.outZoneBar) charts.outZoneBar.destroy();
+  charts.outZoneBar = new Chart(document.getElementById('outZoneBar'), {
+    type: 'bar',
+    data: {
+      labels: WARDS,
+      datasets: [
+        { label: 'Property Outstanding (Rs.L)', data: propOut,  backgroundColor: 'rgba(192,32,46,.8)' },
+        { label: 'Water Outstanding (Rs.L)',    data: waterOut, backgroundColor: 'rgba(201,138,0,.8)' }
+      ]
+    },
+    options: barOpts('Zone-wise Outstanding — Property & Water (' + getCurrFYLabel() + ')')
+  });
+
+  // Chart 2: RANKED — zones sorted highest to lowest total outstanding (focus priority)
+  var ranked = WARDS.map(function(w,i){
+    return { zone:w, propOut:propOut[i], waterOut:waterOut[i], total:totalOut[i], eff:collEff[i] };
+  }).sort(function(a,b){ return b.total - a.total; }); // descending = highest outstanding first
+
+  var rankColors = ranked.map(function(r,i){
+    if(i === 0) return 'rgba(192,32,46,.95)';       // #1 — critical red
+    if(i <= 2)  return 'rgba(220,80,46,.8)';        // top 3 — orange-red
+    if(i <= 4)  return 'rgba(201,138,0,.8)';        // mid — amber
+    return 'rgba(26,170,92,.7)';                    // lower — green
+  });
+
+  if(charts.outZoneRanked) charts.outZoneRanked.destroy();
+  charts.outZoneRanked = new Chart(document.getElementById('outZoneRanked'), {
+    type: 'bar',
+    data: {
+      labels: ranked.map(function(r){ return r.zone; }),
+      datasets: [{
+        label: 'Total Outstanding (Rs.L)',
+        data:  ranked.map(function(r){ return r.total; }),
+        backgroundColor: rankColors,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'Priority Zones — Ranked by Outstanding Amount (Highest = Most Focus Needed)', font: { size: 13 } },
+        tooltip: { callbacks: {
+          label: function(item) {
+            var r = ranked[item.dataIndex];
+            return [
+              ' Total Outstanding: Rs.' + r.total.toFixed(1) + ' L',
+              ' Property: Rs.' + r.propOut.toFixed(1) + ' L',
+              ' Water: Rs.' + r.waterOut.toFixed(1) + ' L',
+              ' Collection Efficiency: ' + r.eff + '%'
+            ];
+          }
+        }}
+      },
+      scales: {
+        x: { beginAtZero: true, title: { display: true, text: 'Rs. Lakhs' } },
+        y: { ticks: { font: { weight: 'bold' } } }
+      }
+    }
+  });
+
+  // Chart 3: Outstanding split pie
+  if(charts.outPie) charts.outPie.destroy();
+  charts.outPie = new Chart(document.getElementById('outPie'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Property', 'Water'],
+      datasets: [{ data: [propOutstanding, waterOutstanding], backgroundColor: ['#c0202e', '#c98a00'] }]
+    },
+    options: pieOpts('Outstanding Split — Property vs Water (Rs.L)')
+  });
+
+  // Chart 4: Collection efficiency per zone (lower = needs more attention)
+  var effColors = collEff.map(function(e){
+    return e >= 80 ? 'rgba(26,170,92,.8)' : e >= 60 ? 'rgba(201,138,0,.8)' : 'rgba(192,32,46,.8)';
+  });
+  if(charts.outEff) charts.outEff.destroy();
+  charts.outEff = new Chart(document.getElementById('outEffChart'), {
+    type: 'bar',
+    data: {
+      labels: WARDS,
+      datasets: [{ label: 'Collection Efficiency %', data: collEff, backgroundColor: effColors, borderRadius: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'Collection Efficiency % per Zone (Red < 60%, Amber 60-80%, Green > 80%)', font: { size: 12 } },
+        tooltip: { callbacks: {
+          afterLabel: function(item) {
+            return item.raw < 60 ? '⚠ Critical — needs immediate focus' :
+                   item.raw < 80 ? '⚡ Moderate — improvement needed' : '✓ Good';
+          }
+        }}
+      },
+      scales: { y: { min: 0, max: 100, title: { display: true, text: '%' } } }
+    }
+  });
+}
 
 /* =============================================
    PROPERTY COUNT ZONE-WISE (real data from dashboard)
@@ -947,7 +1501,6 @@ function printReport(panelId) {
 }
 
 buildReports();
-
 
 
 

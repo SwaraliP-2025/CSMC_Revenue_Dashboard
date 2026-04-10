@@ -262,6 +262,3 @@ tfoot td{font-weight:700;background:#f0f4f8;color:#0d2137;padding:8px 12px;borde
 .misc-sub-list.open{display:block;}
 .misc-sub-list li{font-size:.8rem;color:#444;padding:3px 0;border-bottom:1px solid #eef0f3;}
 .misc-sub-list li:last-child{border-bottom:none;}
-
-/* ===== OUTSTANDING PRIORITY TABLE ===== */
-.out-priority-header{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;gap:12px;margin:18px 0 6px;font-weight:700;color:#0d2137;font-size:.95rem;-ms-flex-wrap:wrap;flex-wrap:wrap;}
