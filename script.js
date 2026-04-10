@@ -294,66 +294,42 @@ function refreshStatStrips(fy) {
    ============================================= */
 var MISC_SUB_SERVICES = {
   "misc-health": [
-    "OPD Fees — Shivaji Nagar",
-    "OPD Fees — Satara",
-    "OPD Fees — Saadat Nagar",
-    "OPD Fees — Cidco N-11",
-    "OPD Fees — Cidco N-8",
-    "OPD Fees — Silk Mill Colony",
-    "OPD Fees — Harsh Nagar",
-    "OPD Fees — Harsul",
-    "OPD Fees — Kabir Nagar",
-    "OPD Fees — Jinsi (New)",
-    "OPD Fees — Misarwadi"
+    "OPD Fees — Shivaji Nagar","OPD Fees — Satara","OPD Fees — Saadat Nagar",
+    "OPD Fees — Cidco N-11","OPD Fees — Cidco N-8","OPD Fees — Silk Mill Colony",
+    "OPD Fees — Harsh Nagar","OPD Fees — Harsul","OPD Fees — Kabir Nagar",
+    "OPD Fees — Jinsi (New)","OPD Fees — Misarwadi"
   ],
   "misc-civic": [
-    "Playground Rent (क्रिडांगन भाडे)",
-    "Theater Rent (नाट्यगृह भाडे)",
-    "Building Rent (इमारत भाडे)",
-    "Land / Stall Rent (जमीन भाडे / टपरी भाडे)",
-    "Swimming Pool Membership Fees (जलतरण तलाव सभासद फी)",
-    "Zoo Entry Fees (प्राणी संग्रहालय प्रवेश फी)",
-    "Aquarium Entry Fees (मत्स्यालय प्रवेश फी)",
-    "Adventure Park Royalty — Chhatrapati Sambhaji Maharaj Adventure Park"
+    "Playground Rent (क्रिडांगन भाडे)","Theater Rent (नाट्यगृह भाडे)",
+    "Building Rent (इमारत भाडे)","Land / Stall Rent (जमीन भाडे / टपरी भाडे)",
+    "Swimming Pool Membership Fees","Zoo Entry Fees (प्राणी संग्रहालय)",
+    "Aquarium Entry Fees (मत्स्यालय)","Adventure Park Royalty (Chhatrapati Sambhaji Maharaj)"
   ],
   "misc-urban": [
-    "Gunthewari Development — Recovery & Development Works (वसुली / विकास कामे)",
+    "Gunthewari Development (वसुली / विकास कामे)",
     "Building Permission Fees (नगर रचना बांधकाम अनामत)",
     "Building Regularization Premiums (इमारत नियमितकरण प्रिमीयम)",
     "Fines for Illegal Construction (बांधकाम परवाना नियमित दंड)"
   ],
   "misc-sanitation": [
     "Solid Waste Management Fines & Fees (नागरी घन कचरा व्‍यवस्‍थापन)",
-    "Bio-Medical Waste Project — Membership & Registration Fees (नोंदणी फी)",
+    "Bio-Medical Waste Registration Fees (नोंदणी फी)",
     "Treated Sewage Water Fees",
     "Sale of Trees & Flowers (झाडे व फुले विक्री)"
   ],
   "misc-safety": [
-    "Fire Call Charges",
-    "Fire Fund (अग्नीशमन निधी)",
-    "Marriage Registration (विवाह नोंदणी)",
-    "Birth & Death Fees (जन्म व मृत्यु फी)",
-    "General License Fees",
-    "Plumber License Fees (Water Supply Department)",
+    "Fire Call Charges","Fire Fund (अग्नीशमन निधी)",
+    "Marriage Registration (विवाह नोंदणी)","Birth & Death Fees (जन्म व मृत्यु फी)",
+    "General License Fees","Plumber License Fees (Water Supply)",
     "Advertisement / Hoarding Boards (जाहीराती बोर्ड)"
   ],
   "misc-water": [
-    "Tanker Charges — Water Sale (पाणी विक्री टॅंकर भाडे)",
-    "New Water Connection Fees (नवीन नळ जोडणी)",
-    "Fines for Water Wastage",
-    "Drainage Connection Fees",
-    "Drainage Line Advance Payments",
-    "Road Construction / Repair Grants (रस्ते बांधणी व दुरुस्ती अनुदान)"
-  ],
-  "misc-admin": [
-    "Tender Forms (टेंडर फोर्म)",
-    "Slaughterhouse Fees / Auctions (कत्तल खाना)",
-    "Cattle Pound Fees (कोंडवाडा फी)",
-    "NA Tax (Non-Agricultural Tax)",
-    "GST — CGST 1% / SGST 1%",
-    "GST — CGST 6% / SGST 6%",
-    "GST — CGST 9% / SGST 9%",
-    "Ambulance & Vehicle Charges"
+    "Tanker Charges (पाणी विक्री टॅंकर भाडे)","New Water Connection Fees (नवीन नळ जोडणी)",
+    "Fines for Water Wastage","Drainage Connection Fees",
+    "Drainage Advance Payments","Road Construction / Repair Grants (रस्ते बांधणी व दुरुस्ती अनुदान)",
+    "Tender Forms (टेंडर फोर्म)","Ambulance & Vehicle Charges",
+    "Slaughterhouse Fees (कत्तल खाना)","Cattle Pound Fees (कोंडवाडा फी)",
+    "NA Tax","GST (CGST/SGST — 1%, 6%, 9%)"
   ]
 };
 
@@ -839,7 +815,7 @@ function createCharts() {
   var miscMonthly = MONTHS.map(function(m,i){
     var t=0; Object.keys(miscServices).forEach(function(k){ t+=miscServices[k].all[i]; }); return t;
   });
-  var miscLabels=[],miscVals=[],miscColors=['#c0202e','#1a7fc4','#0d4f8a','#0a6b3a','#7a5200','#2d1b6e','#555e6e'];
+  var miscLabels=[],miscVals=[],miscColors=['#c0202e','#1a7fc4','#0d4f8a','#0a6b3a','#7a5200','#2d1b6e'];
   Object.keys(miscServices).forEach(function(k){ miscLabels.push(miscServices[k].label); miscVals.push(sum(miscServices[k].all)); });
 
   charts.overviewZone = new Chart(document.getElementById('overviewZoneChart'),{type:'bar',data:{labels:WARDS,datasets:[
@@ -1501,6 +1477,5 @@ function printReport(panelId) {
 }
 
 buildReports();
-
 
 
