@@ -222,7 +222,6 @@ function loadFYData(fy) {
   }
 }
 
-loadFYData("2025-26");
 
 /* ===== UPDATE KPI CARDS ===== */
 function updateKPIs(fy) {
@@ -289,9 +288,7 @@ function refreshStatStrips(fy) {
     {label:"vs "+pl,        value:(waterTotal>waterTotal_prev?"+":"")+pct(waterTotal-waterTotal_prev,waterTotal_prev)+"%"}
   ]);
 }
-/* =============================================
-   MISC SUB-SERVICES per category
-   ============================================= */
+
 var MISC_SUB_SERVICES = {
   "misc-health": [
     "OPD Fees — Shivaji Nagar","OPD Fees — Satara","OPD Fees — Saadat Nagar",
@@ -390,7 +387,6 @@ function buildMiscSection(key) {
     +'</div>';
 }
 function buildAllMiscSections(){ Object.keys(miscServices).forEach(buildMiscSection); }
-buildAllMiscSections();
 /* ===== CHART HELPERS ===== */
 var charts = {};
 function buildBarDS(dem, coll, mode) {
@@ -674,129 +670,6 @@ function renderRTSTable(dept) {
   }).join('');
 }
 
-/* ===== OUTSTANDING SECTION ===== */
-function buildOutstandingCharts() {
-  var propOut  = propDemand.map(function(v,i){ return v - propColl.all[i]; });
-  var waterOut = waterDemand.map(function(v,i){ return v - waterColl.all[i]; });
-  var totalOut = WARDS.map(function(w,i){ return propOut[i] + waterOut[i]; });
-  var collEff  = WARDS.map(function(w,i){
-    var dem = propDemand[i] + waterDemand[i];
-    var col = propColl.all[i] + waterColl.all[i];
-    return dem > 0 ? Math.round(col/dem*100) : 0;
-  });
-
-  // Stat strip
-  makeStatStrip('outStatStrip', [
-    {label:'Property Outstanding',  value: fmtFull(propOutstanding),  sub: fmt(propOutstanding)},
-    {label:'Water Outstanding',     value: fmtFull(waterOutstanding), sub: fmt(waterOutstanding)},
-    {label:'Total Outstanding',     value: fmtFull(totalOutstanding), sub: fmt(totalOutstanding)},
-    {label:'% of Demand',           value: pct(totalOutstanding, grandDemand)+'%'},
-    {label:'Highest Outstanding',   value: WARDS[totalOut.indexOf(Math.max.apply(null,totalOut))], sub: 'Focus zone'},
-    {label:'Lowest Efficiency',     value: WARDS[collEff.indexOf(Math.min.apply(null,collEff))],   sub: pct(Math.min.apply(null,collEff),100)+'% eff.'}
-  ]);
-
-  // Chart 1: Zone bar — property + water outstanding side by side
-  if(charts.outZoneBar) charts.outZoneBar.destroy();
-  charts.outZoneBar = new Chart(document.getElementById('outZoneBar'), {
-    type: 'bar',
-    data: {
-      labels: WARDS,
-      datasets: [
-        { label: 'Property Outstanding (Rs.L)', data: propOut,  backgroundColor: 'rgba(192,32,46,.8)' },
-        { label: 'Water Outstanding (Rs.L)',    data: waterOut, backgroundColor: 'rgba(201,138,0,.8)' }
-      ]
-    },
-    options: barOpts('Zone-wise Outstanding — Property & Water (' + getCurrFYLabel() + ')')
-  });
-
-  // Chart 2: RANKED — zones sorted highest to lowest total outstanding (focus priority)
-  var ranked = WARDS.map(function(w,i){
-    return { zone:w, propOut:propOut[i], waterOut:waterOut[i], total:totalOut[i], eff:collEff[i] };
-  }).sort(function(a,b){ return b.total - a.total; }); // descending = highest outstanding first
-
-  var rankColors = ranked.map(function(r,i){
-    if(i === 0) return 'rgba(192,32,46,.95)';       // #1 — critical red
-    if(i <= 2)  return 'rgba(220,80,46,.8)';        // top 3 — orange-red
-    if(i <= 4)  return 'rgba(201,138,0,.8)';        // mid — amber
-    return 'rgba(26,170,92,.7)';                    // lower — green
-  });
-
-  if(charts.outZoneRanked) charts.outZoneRanked.destroy();
-  charts.outZoneRanked = new Chart(document.getElementById('outZoneRanked'), {
-    type: 'bar',
-    data: {
-      labels: ranked.map(function(r){ return r.zone; }),
-      datasets: [{
-        label: 'Total Outstanding (Rs.L)',
-        data:  ranked.map(function(r){ return r.total; }),
-        backgroundColor: rankColors,
-        borderRadius: 4
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Priority Zones — Ranked by Outstanding Amount (Highest = Most Focus Needed)', font: { size: 13 } },
-        tooltip: { callbacks: {
-          label: function(item) {
-            var r = ranked[item.dataIndex];
-            return [
-              ' Total Outstanding: Rs.' + r.total.toFixed(1) + ' L',
-              ' Property: Rs.' + r.propOut.toFixed(1) + ' L',
-              ' Water: Rs.' + r.waterOut.toFixed(1) + ' L',
-              ' Collection Efficiency: ' + r.eff + '%'
-            ];
-          }
-        }}
-      },
-      scales: {
-        x: { beginAtZero: true, title: { display: true, text: 'Rs. Lakhs' } },
-        y: { ticks: { font: { weight: 'bold' } } }
-      }
-    }
-  });
-
-  // Chart 3: Outstanding split pie
-  if(charts.outPie) charts.outPie.destroy();
-  charts.outPie = new Chart(document.getElementById('outPie'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Property', 'Water'],
-      datasets: [{ data: [propOutstanding, waterOutstanding], backgroundColor: ['#c0202e', '#c98a00'] }]
-    },
-    options: pieOpts('Outstanding Split — Property vs Water (Rs.L)')
-  });
-
-  // Chart 4: Collection efficiency per zone (lower = needs more attention)
-  var effColors = collEff.map(function(e){
-    return e >= 80 ? 'rgba(26,170,92,.8)' : e >= 60 ? 'rgba(201,138,0,.8)' : 'rgba(192,32,46,.8)';
-  });
-  if(charts.outEff) charts.outEff.destroy();
-  charts.outEff = new Chart(document.getElementById('outEffChart'), {
-    type: 'bar',
-    data: {
-      labels: WARDS,
-      datasets: [{ label: 'Collection Efficiency %', data: collEff, backgroundColor: effColors, borderRadius: 4 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        title: { display: true, text: 'Collection Efficiency % per Zone (Red < 60%, Amber 60-80%, Green > 80%)', font: { size: 12 } },
-        tooltip: { callbacks: {
-          afterLabel: function(item) {
-            return item.raw < 60 ? '⚠ Critical — needs immediate focus' :
-                   item.raw < 80 ? '⚡ Moderate — improvement needed' : '✓ Good';
-          }
-        }}
-      },
-      scales: { y: { min: 0, max: 100, title: { display: true, text: '%' } } }
-    }
-  });
-}
-
 /* =============================================
    PROPERTY COUNT ZONE-WISE (real data from dashboard)
    Total: 3,37,497 properties
@@ -805,10 +678,8 @@ var PROP_COUNT_ZONE = [39200, 45500, 21600, 30800, 37500, 42500, 23700, 34900, 4
 // Total = 336,000 — adjust last zone to hit exact 337,497
 PROP_COUNT_ZONE[9] = 337497 - PROP_COUNT_ZONE.slice(0,9).reduce(function(a,b){return a+b;},0);
 
-/* Water connections zone-wise (estimated proportional to water demand) */
-var WATER_CONN_ZONE = waterDemand.map(function(d){
-  return Math.round((d / sum(waterDemand)) * 185000);
-});
+/* Water connections zone-wise — calculated inside createCharts after loadFYData */
+var WATER_CONN_ZONE = [];
 
 /* ===== CREATE ALL CHARTS ===== */
 function createCharts() {
@@ -872,6 +743,9 @@ function createCharts() {
   ]},options:barOpts('Property — Year-on-Year Monthly (Rs.L)')});
 
   /* WATER CONNECTION COUNT ZONE-WISE */
+  WATER_CONN_ZONE = waterDemand.map(function(d){
+    return Math.round((d / sum(waterDemand)) * 185000);
+  });
   var waterConnTotal = WATER_CONN_ZONE.reduce(function(a,b){return a+b;},0);
   charts.waterConn = new Chart(document.getElementById('waterConnCountChart'),{
     type:'bar',
@@ -923,6 +797,18 @@ function createCharts() {
 
   var digProp=propMoM.map(function(v){return Math.round(v*.5);}), digWater=waterMoM.map(function(v){return Math.round(v*.45);});
   var digMisc=MONTHS.map(function(m,i){var t=0;Object.keys(miscServices).forEach(function(k){t+=miscServices[k].online[i];});return t;});
+
+  // Digital comparison banner — FY 2024-25 actual: Rs.52 Cr digital (property + water)
+  var prevDigital = 5200; // Rs.52 Cr = 5200 L
+  var currDigital = sum(digProp) + sum(digWater) + sum(digMisc);
+  var digGrowth   = Math.round((currDigital - prevDigital) / prevDigital * 100);
+  var bannerEl2   = document.getElementById('digitalCompareBanner');
+  if(bannerEl2) bannerEl2.innerHTML =
+    '<div class="digital-compare-item"><div class="digital-compare-label">FY 2024-25 Digital Collection</div><div class="digital-compare-val">\u20b952 Cr</div><div class="digital-compare-sub">Property + Water (Actual)</div></div>'
+    +'<div class="digital-compare-arrow">\u2192</div>'
+    +'<div class="digital-compare-item"><div class="digital-compare-label">FY 2025-26 Digital Collection</div><div class="digital-compare-val">'+fmt(currDigital)+'</div><div class="digital-compare-sub">Property + Water + Misc</div></div>'
+    +'<div class="digital-compare-growth">'+(digGrowth>=0?'+':'')+digGrowth+'% YoY</div>';
+
   charts.digital = new Chart(document.getElementById('digitalMonthlyChart'),{type:'line',data:{labels:MONTHS,datasets:[
     {label:'Property Online',data:digProp,borderColor:'#1a7fc4',backgroundColor:'rgba(26,127,196,.1)',fill:true,tension:.4},
     {label:'Water Online',data:digWater,borderColor:'#1aaa5c',backgroundColor:'rgba(26,170,92,.1)',fill:true,tension:.4},
@@ -941,7 +827,112 @@ function createCharts() {
   /* --- OUTSTANDING --- */
   buildOutstandingCharts();
 }
-createCharts();
+
+/* ===== OUTSTANDING SECTION ===== */
+function buildOutstandingCharts() {
+  var propAprTotal = propMoM[0], waterAprTotal = waterMoM[0];
+  var propDemTotal = sum(propDemand), waterDemTotal = sum(waterDemand);
+  var propAprColl  = propDemand.map(function(d){ return Math.round(d/propDemTotal*propAprTotal*10)/10; });
+  var waterAprColl = waterDemand.map(function(d){ return Math.round(d/waterDemTotal*waterAprTotal*10)/10; });
+  var propOut  = propDemand.map(function(v,i){ return Math.round((v-propAprColl[i])*10)/10; });
+  var waterOut = waterDemand.map(function(v,i){ return Math.round((v-waterAprColl[i])*10)/10; });
+  var totalOut = WARDS.map(function(w,i){ return Math.round((propOut[i]+waterOut[i])*10)/10; });
+  var propAprCollTotal = sum(propAprColl), waterAprCollTotal = sum(waterAprColl);
+  var propOutTotal = sum(propOut), waterOutTotal = sum(waterOut);
+  var totalOutApr  = propOutTotal + waterOutTotal;
+  var grandDem     = sum(propDemand) + sum(waterDemand);
+  var aprCollected = propAprCollTotal + waterAprCollTotal;
+  var collEff = WARDS.map(function(w,i){
+    var dem = propDemand[i]+waterDemand[i], col = propAprColl[i]+waterAprColl[i];
+    return dem>0 ? Math.round(col/dem*100) : 0;
+  });
+
+  // Top banner
+  var bannerEl = document.getElementById('outBanner');
+  if(bannerEl) bannerEl.innerHTML = [
+    {label:'Total Outstanding',   val:fmtFull(totalOutApr),  sub:fmt(totalOutApr)+' of '+fmt(grandDem)+' demand',  cls:'red'},
+    {label:'Property Outstanding',val:fmtFull(propOutTotal), sub:fmt(propOutTotal),                                 cls:'amber'},
+    {label:'Water Outstanding',   val:fmtFull(waterOutTotal),sub:fmt(waterOutTotal),                                cls:'amber'},
+    {label:'April Collected',     val:fmtFull(aprCollected), sub:fmt(aprCollected)+' collected so far',             cls:'green'},
+    {label:'Collection Efficiency',val:pct(aprCollected,grandDem)+'%', sub:'April 2025 only',                       cls:'blue'},
+    {label:'Recovery Potential',  val:fmtFull(totalOutApr),  sub:'11 months remaining',                             cls:'blue'}
+  ].map(function(s){
+    return '<div class="out-banner-stat"><div class="out-banner-label">'+s.label+'</div>'
+      +'<div class="out-banner-value '+s.cls+'">'+s.val+'</div>'
+      +'<div class="out-banner-sub">'+s.sub+'</div></div>';
+  }).join('');
+
+  // Zone priority cards
+  var ranked = WARDS.map(function(w,i){
+    return {zone:w, propOut:propOut[i], waterOut:waterOut[i], total:totalOut[i], eff:collEff[i]};
+  }).sort(function(a,b){ return b.total-a.total; });
+  var maxOut = ranked[0].total;
+  var rankClasses = ['rank-1','rank-2','rank-3','rank-4','rank-5'];
+  var barColors   = ['#c0202e','#d94f20','#c98a00','#7a9ab8','#7a9ab8'];
+
+  var gridEl = document.getElementById('outZoneGrid');
+  if(gridEl) gridEl.innerHTML = ranked.map(function(r,i){
+    var pClass   = i===0?'priority-1':i<=2?'priority-2':i<=4?'priority-3':'priority-low';
+    var rClass   = i===0?'r1':i<=2?'r2':i<=4?'r3':'rlow';
+    var effColor = r.eff>=15?'#1aaa5c':r.eff>=8?'#c98a00':'#c0202e';
+    var focus    = i===0?' \uD83C\uDFAF':i<=2?' \u26A0\uFE0F':'';
+    return '<div class="out-zone-card '+pClass+'">'
+      +'<div class="out-zone-card-rank '+rClass+'">'+(i+1)+'</div>'
+      +'<div class="out-zone-name">'+r.zone+focus+'</div>'
+      +'<div class="out-zone-amount">'+fmtFull(r.total)+'</div>'
+      +'<div class="out-zone-sub">'+fmt(r.total)+' outstanding</div>'
+      +'<div class="out-zone-sub">Prop: '+fmt(r.propOut)+' | Water: '+fmt(r.waterOut)+'</div>'
+      +'<div class="out-zone-eff-bar"><div class="out-zone-eff-fill" style="width:'+r.eff+'%;background:'+effColor+'"></div></div>'
+      +'<div class="out-zone-eff-label">'+r.eff+'% collected (April)</div>'
+      +'</div>';
+  }).join('');
+
+  // Ranked horizontal stacked bar
+  if(charts.outZoneRanked) charts.outZoneRanked.destroy();
+  charts.outZoneRanked = new Chart(document.getElementById('outZoneRanked'),{
+    type:'bar',
+    data:{
+      labels:ranked.map(function(r){return r.zone;}),
+      datasets:[
+        {label:'Property Outstanding (Rs.L)',data:ranked.map(function(r){return r.propOut;}),backgroundColor:'rgba(192,32,46,.85)',borderRadius:3},
+        {label:'Water Outstanding (Rs.L)',   data:ranked.map(function(r){return r.waterOut;}),backgroundColor:'rgba(201,138,0,.75)',borderRadius:3}
+      ]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top'},
+        title:{display:true,text:'Zones Ranked by Outstanding — Focus Priority (April 2025)',font:{size:13}},
+        tooltip:{callbacks:{afterBody:function(items){
+          var r=ranked[items[0].dataIndex];
+          return ['Efficiency: '+r.eff+'%', r.eff<8?'\u26A0 Critical':r.eff<15?'\u26A1 Moderate':'\u2713 On track'];
+        }}}
+      },
+      scales:{x:{stacked:true,beginAtZero:true,title:{display:true,text:'Rs. Lakhs'}},y:{stacked:true,ticks:{font:{weight:'bold'}}}}
+    }
+  });
+
+  // Doughnut
+  if(charts.outPie) charts.outPie.destroy();
+  charts.outPie = new Chart(document.getElementById('outPie'),{
+    type:'doughnut',
+    data:{labels:['Property Outstanding','Water Outstanding','Collected (April)'],
+      datasets:[{data:[propOutTotal,waterOutTotal,aprCollected],backgroundColor:['#c0202e','#c98a00','#1aaa5c'],hoverOffset:6}]},
+    options:pieOpts('Outstanding vs Collected — April 2025 (Rs.L)')
+  });
+
+  // Efficiency bar
+  var effColors2 = collEff.map(function(e){return e>=15?'rgba(26,170,92,.85)':e>=8?'rgba(201,138,0,.85)':'rgba(192,32,46,.85)';});
+  if(charts.outEff) charts.outEff.destroy();
+  charts.outEff = new Chart(document.getElementById('outEffChart'),{
+    type:'bar',
+    data:{labels:WARDS,datasets:[{label:'Collection Efficiency % (April)',data:collEff,backgroundColor:effColors2,borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},title:{display:true,text:'Collection Efficiency % per Zone — April 2025',font:{size:12}},
+        tooltip:{callbacks:{afterLabel:function(item){return item.raw<8?'\u26A0 Critical':item.raw<15?'\u26A1 Moderate':'\u2713 Good';}}}},
+      scales:{y:{min:0,max:100,title:{display:true,text:'%'}}}}
+  });
+}
 
 /* ===== SWITCH FY ===== */
 function switchFY(fy, btn) {
@@ -950,19 +941,25 @@ function switchFY(fy, btn) {
   document.querySelectorAll('.fy-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   loadFYData(fy);
+  buildAllMiscSections();
   updateKPIs(fy);
   refreshStatStrips(fy);
-  buildAllMiscSections();
   Object.keys(charts).forEach(function(k){ if(charts[k]) charts[k].destroy(); });
   charts = {};
   createCharts();
-  buildOutstandingCharts();
   displayTable();
 }
 
 /* ===== INITIAL RENDER ===== */
-updateKPIs("2025-26");
-refreshStatStrips("2025-26");
+document.addEventListener('DOMContentLoaded', function() {
+  loadFYData("2025-26");
+  buildAllMiscSections();
+  updateKPIs("2025-26");
+  refreshStatStrips("2025-26");
+  createCharts();
+  buildReports();
+  displayTable();
+});
 
 /* ===== PROPERTY TABLE ===== */
 
@@ -1282,11 +1279,6 @@ function clearDateFilter(section) {
   }
 }
 
-displayTable();
-
-
-
-
 
 /* =============================================
    REPORTS MODULE
@@ -1476,6 +1468,6 @@ function printReport(panelId) {
   win.print();
 }
 
-buildReports();
+
 
 

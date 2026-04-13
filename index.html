@@ -200,7 +200,7 @@
       <input type="date" id="toDate">
       <button class="btn-primary" onclick="applyFilters()">Apply</button>
       <button class="btn-secondary" onclick="clearFilters()">Clear</button>
-      <span class="filter-hint">⚠ Filters the transaction table only. Charts show full FY data.</span>
+      <span class="filter-hint"> Filters the transaction table only. Charts show full FY data.</span>
     </div>
     <div class="mode-filter" id="propertyModeFilter">
       <span class="mode-label">Mode:</span>
@@ -367,6 +367,7 @@
     <h2>Digital Collections</h2>
     <div class="section-meta fy-meta" data-suffix="Online | UPI | NEFT/RTGS">Online | UPI | NEFT/RTGS | FY 2025-26</div>
   </div>
+  <div id="digitalCompareBanner" class="digital-compare"></div>
   <div class="grid">
     <div class="chart-box full-width h300"><canvas id="digitalMonthlyChart"></canvas></div>
     <div class="chart-box h250"><canvas id="digitalModePie"></canvas></div>
@@ -379,14 +380,20 @@
 <div id="outstanding" class="section">
   <div class="section-header">
     <h2> Total Outstanding</h2>
-    <div class="section-meta fy-meta" data-suffix="Zone-wise + Head Office">Zone-wise + Head Office | FY 2025-26</div>
+    <div class="section-meta fy-meta" data-suffix="Zone-wise | April 2025">Zone-wise | April 2025 | FY 2025-26</div>
   </div>
-  <div class="stat-strip" id="outStatStrip"></div>
-  <div class="grid">
-    <div class="chart-box full-width h320"><canvas id="outZoneBar"></canvas></div>
+
+  <!-- Top summary banner -->
+  <div class="out-banner" id="outBanner"></div>
+
+  <!-- Zone priority cards -->
+  <div class="out-zone-grid" id="outZoneGrid"></div>
+
+  <!-- Charts row -->
+  <div class="grid" style="margin-top:16px;">
     <div class="chart-box full-width h300"><canvas id="outZoneRanked"></canvas></div>
-    <div class="chart-box h280"><canvas id="outPie"></canvas></div>
-    <div class="chart-box h280"><canvas id="outEffChart"></canvas></div>
+    <div class="chart-box h260"><canvas id="outPie"></canvas></div>
+    <div class="chart-box h260"><canvas id="outEffChart"></canvas></div>
   </div>
 </div>
 
