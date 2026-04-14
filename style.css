@@ -34,7 +34,7 @@ body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;display
 .fy-btn.active{background:#1a3a5c;color:#00e5ff;-webkit-box-shadow:0 1px 4px rgba(0,0,0,.15);box-shadow:0 1px 4px rgba(0,0,0,.15);}
 
 /* ===== PAGE WRAPPER ===== */
-.page-wrapper{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:1;-ms-flex:1;flex:1;overflow:hidden;position:relative;min-height:calc(100vh - 96px);-webkit-box-align:stretch;-ms-flex-align:stretch;align-items:stretch;}
+.page-wrapper{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-flex:1;-ms-flex:1;flex:1;overflow:visible;position:relative;min-height:calc(100vh - 96px);-webkit-box-align:stretch;-ms-flex-align:stretch;align-items:stretch;}
 
 /* ===== SIDEBAR ===== */
 .sidebar{width:230px;background:#0d2137;color:#c8d8e8;min-height:100%;padding:12px 0;overflow-y:auto;-webkit-transition:width .25s ease,padding .25s ease;-o-transition:width .25s ease,padding .25s ease;transition:width .25s ease,padding .25s ease;-ms-flex-negative:0;flex-shrink:0;}

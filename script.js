@@ -4,7 +4,20 @@
 function showSection(id, label) {
   document.querySelectorAll(".section").forEach(function(s){ s.classList.remove("active"); });
   var el = document.getElementById(id);
-  if(el) el.classList.add("active");
+  if(el) {
+    el.classList.add("active");
+    // Scroll main to top
+    var main = document.querySelector('.main');
+    if(main) main.scrollTop = 0;
+    // Resize all charts in this section so they render correctly
+    setTimeout(function(){
+      Object.keys(charts).forEach(function(k){
+        if(charts[k] && typeof charts[k].resize === 'function') {
+          try { charts[k].resize(); } catch(e){}
+        }
+      });
+    }, 50);
+  }
   var name = label || id.charAt(0).toUpperCase() + id.slice(1);
   document.getElementById("breadcrumbTitle").textContent = name;
   document.getElementById("breadcrumbLink").textContent  = name;
