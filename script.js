@@ -976,15 +976,13 @@ function switchFY(fy, btn) {
 }
 
 /* ===== INITIAL RENDER ===== */
-document.addEventListener('DOMContentLoaded', function() {
-  loadFYData("2025-26");
-  try { buildAllMiscSections(); } catch(e) { console.error("buildAllMiscSections error:", e); }
-  try { updateKPIs("2025-26"); } catch(e) { console.error("updateKPIs error:", e); }
-  try { refreshStatStrips("2025-26"); } catch(e) { console.error("refreshStatStrips error:", e); }
-  try { createCharts(); } catch(e) { console.error("createCharts error:", e); }
-  try { buildReports(); } catch(e) { console.error("buildReports error:", e); }
-  try { displayTable(); } catch(e) { console.error("displayTable error:", e); }
-});
+loadFYData("2025-26");
+buildAllMiscSections();
+updateKPIs("2025-26");
+refreshStatStrips("2025-26");
+createCharts();
+buildReports();
+displayTable();
 
 /* ===== PROPERTY TABLE ===== */
 
