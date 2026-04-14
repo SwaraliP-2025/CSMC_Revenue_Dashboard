@@ -835,7 +835,7 @@ function createCharts() {
   ]},options:barOpts('Digital Collections — Year-on-Year (Rs.L)')});
 
   /* --- OUTSTANDING --- */
-  buildOutstandingCharts();
+  // buildOutstandingCharts(); // canvases commented out — skip
 }
 
 /* ===== OUTSTANDING SECTION ===== */
@@ -967,11 +967,7 @@ document.addEventListener('DOMContentLoaded', function() {
   buildAllMiscSections();
   updateKPIs("2025-26");
   refreshStatStrips("2025-26");
-  try {
-    createCharts();
-  } catch(e) {
-    console.error("createCharts error:", e);
-  }
+  try { createCharts(); } catch(e) { console.error("createCharts error:", e); }
   buildReports();
   displayTable();
 });
