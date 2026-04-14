@@ -3,7 +3,8 @@
 /* ===== NAVIGATION ===== */
 function showSection(id, label) {
   document.querySelectorAll(".section").forEach(function(s){ s.classList.remove("active"); });
-  document.getElementById(id).classList.add("active");
+  var el = document.getElementById(id);
+  if(el) el.classList.add("active");
   var name = label || id.charAt(0).toUpperCase() + id.slice(1);
   document.getElementById("breadcrumbTitle").textContent = name;
   document.getElementById("breadcrumbLink").textContent  = name;
