@@ -982,7 +982,6 @@ buildAllMiscSections();
 updateKPIs("2025-26");
 refreshStatStrips("2025-26");
 createCharts();
-displayTable();
 
 /* ===== PROPERTY TABLE ===== */
 
@@ -1091,12 +1090,15 @@ otherZones.forEach(function(zone){
 
 var currentPage = 1, rowsPerPage = 10;
 
+/* tableData is now fully populated — safe to render */
+displayTable();
+
 function displayTable(fromDate, toDate) {
   var tbody = document.querySelector('#dataTable tbody');
   if(!tbody) return;
   tbody.innerHTML = '';
 
-  var filtered = tableData.filter(function(d){
+  var filtered = (tableData || []).filter(function(d){
     var dateOk   = (!fromDate || !toDate) || (d.date >= fromDate && d.date <= toDate);
     var zoneEl   = document.getElementById('tblZoneFilter');
     var modeEl   = document.getElementById('tblModeFilter');
