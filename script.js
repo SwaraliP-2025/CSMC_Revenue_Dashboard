@@ -982,7 +982,6 @@ buildAllMiscSections();
 updateKPIs("2025-26");
 refreshStatStrips("2025-26");
 createCharts();
-buildReports();
 displayTable();
 
 /* ===== PROPERTY TABLE ===== */
@@ -1372,6 +1371,9 @@ var DAYWISE_DATA = [];
   DAYWISE_DATA.sort(function(a,b){ return a._dt - b._dt; });
 })();
 
+/* All report data is now ready — build reports */
+buildReports();
+
 /* ===== REPORT FUNCTIONS ===== */
 function showReport(id, btn) {
   document.querySelectorAll('.report-panel').forEach(function(p){ p.classList.remove('active'); });
@@ -1412,7 +1414,7 @@ function renderZoneCount(search) {
 }
 
 function renderUsageWise(search) {
-  var data = USAGE_WISE_DATA.filter(function(r){
+  var data = (USAGE_WISE_DATA || []).filter(function(r){
     if(!search) return true;
     var s = search.toLowerCase();
     return r.ward.toLowerCase().indexOf(s)>-1 || r.usage.toLowerCase().indexOf(s)>-1;
@@ -1429,7 +1431,7 @@ function renderUsageWise(search) {
 }
 
 function renderDaywise(search) {
-  var data = DAYWISE_DATA.filter(function(r){
+  var data = (DAYWISE_DATA || []).filter(function(r){
     if(!search) return true;
     var s = search.toLowerCase();
     return r.date.toLowerCase().indexOf(s)>-1 || r.mode.toLowerCase().indexOf(s)>-1;
