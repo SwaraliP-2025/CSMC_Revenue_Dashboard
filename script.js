@@ -412,10 +412,16 @@ var MISC_SUB_SERVICES = {
     "मांस परवाना (मटन, फिश, चिकन, बीफ)",
     "इतर परवाना फी",
     "Pitch Parwana",
-    "Tender Form Fees / टेंडर फोर्म",
+    "Tender Form Fees",
+    "टेंडर फोर्म",
     "True Copy Fee",
     "शोधनावळ व नक्कल फी",
-    "एल.बी.टी. मुद्रांक शुल्क"
+    "एल.बी.टी. मुद्रांक शुल्क",
+    "नाहरकत प्रमाणपत्र नुतनीकरण फी (Renewal NOC)",
+    "आगीपासुन संरक्षण प्रमाणपत्र फी",
+    "प्लंबर परवाना फी",
+    "विवाह नोंदणी फी (Marriage Registration)",
+    "जाहिरात बोर्ड परवाना (Hoarding/Advertisement Board)"
   ],
   "misc-sanitation": [
     "नागरी घन कचरा व्यवस्थापन Fine & Fees",
@@ -423,7 +429,8 @@ var MISC_SUB_SERVICES = {
     "फायर कॉल चार्जेस (Fire Call Charges)",
     "FIRE OTHER",
     "FSD",
-    "फायर फंड (अग्निशमन निधी)"
+    "फायर फंड (अग्निशमन निधी)",
+    "झाडे तोडणे / छाटणे शुल्क (Tree Felling / Trimming)"
   ],
   "misc-parks": [
     "KAMAL TALAV GARDEN ENTRY FEE",
@@ -441,13 +448,18 @@ var MISC_SUB_SERVICES = {
     "Playground Rent (क्रिडांगन भाडे)",
     "जलतरण तलाव सभासद फी (Swimming Pool Membership)",
     "वाचनालय सभासद नोंदणी फी (Library Membership)",
-    "संग्रहालय प्रवेश फी (Museum Entry Fee)"
+    "संग्रहालय प्रवेश फी (Museum Entry Fee — शिवाजी महाराज पुराणवस्तु संग्राहालय)",
+    "नाट्यगृह भाडे (Theater / Natyagriha Rent)",
+    "सांस्कृतिक कार्यक्रम परवानगी (Cultural Event Permission)",
+    "छायाचित्रण / चित्रीकरण परवानगी (Photography / Filming Permission)",
+    "उद्यान / मैदान आरक्षण (Park / Ground Booking)"
   ],
   "misc-transport": [
     "Vehicle Lifting Charges Royalty",
     "STAND BY DUTY CHARGES",
     "RESCUE CALL CHARGES",
-    "सायकल व स्कुटर थांबे (Cycle & Scooter Stand Fees)"
+    "सायकल व स्कुटर थांबे (Cycle & Scooter Stand Fees)",
+    "वाहन तपासणी / दंड (Vehicle Inspection / Penalty)"
   ],
   "misc-finance": [
     "अन्य इतर कर व वसुली",
