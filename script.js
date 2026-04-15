@@ -8,6 +8,11 @@ function showSection(id, label) {
     // Scroll main to top
     var main = document.querySelector('.main');
     if(main) main.scrollTop = 0;
+    // Lazy render sections that were previously blank
+    if(id === 'digital')     renderDigital();
+    if(id === 'outstanding') renderOutstanding();
+    if(id === 'reports')     { renderZoneCount(); renderUsageWise(); renderDaywise(); }
+    if(id === 'rts')         buildRTSModule();
     // Resize all charts in this section so they render correctly
     setTimeout(function(){
       Object.keys(charts).forEach(function(k){
@@ -972,37 +977,7 @@ function createCharts() {
   /* --- RTS COLLECTIONS --- */
   buildRTSModule();
 
-  var digProp=propMoM.map(function(v){return Math.round(v*.5);}), digWater=waterMoM.map(function(v){return Math.round(v*.45);});
-  var digMisc=MONTHS.map(function(m,i){var t=0;Object.keys(miscServices).forEach(function(k){t+=miscServices[k].online[i];});return t;});
-
-  // Digital comparison banner — FY 2024-25 actual: Rs.52 Cr digital (property + water)
-  var prevDigital = 5200; // Rs.52 Cr = 5200 L
-  var currDigital = sum(digProp) + sum(digWater) + sum(digMisc);
-  var digGrowth   = Math.round((currDigital - prevDigital) / prevDigital * 100);
-  var bannerEl2   = document.getElementById('digitalCompareBanner');
-  if(bannerEl2) bannerEl2.innerHTML =
-    '<div class="digital-compare-item"><div class="digital-compare-label">FY 2024-25 Digital Collection</div><div class="digital-compare-val">\u20b952 Cr</div><div class="digital-compare-sub">Property + Water (Actual)</div></div>'
-    +'<div class="digital-compare-arrow">\u2192</div>'
-    +'<div class="digital-compare-item"><div class="digital-compare-label">FY 2025-26 Digital Collection</div><div class="digital-compare-val">'+fmt(currDigital)+'</div><div class="digital-compare-sub">Property + Water + Misc</div></div>'
-    +'<div class="digital-compare-growth">'+(digGrowth>=0?'+':'')+digGrowth+'% YoY</div>';
-
-  charts.digital = new Chart(document.getElementById('digitalMonthlyChart'),{type:'line',data:{labels:MONTHS,datasets:[
-    {label:'Property Online',data:digProp,borderColor:'#1a7fc4',backgroundColor:'rgba(26,127,196,.1)',fill:true,tension:.4},
-    {label:'Water Online',data:digWater,borderColor:'#1aaa5c',backgroundColor:'rgba(26,170,92,.1)',fill:true,tension:.4},
-    {label:'Misc Online',data:digMisc,borderColor:'#c98a00',backgroundColor:'rgba(201,138,0,.1)',fill:true,tension:.4}
-  ]},options:lineOpts('Digital Collections — Monthly Trend — '+getCurrFYLabel()+' (Rs. Lakhs)')});
-  charts.digitalMode = new Chart(document.getElementById('digitalModePie'),{type:'doughnut',data:{labels:['Online Portal','UPI/QR','NEFT/RTGS'],datasets:[{data:[Math.round(totalDigital*.45),Math.round(totalDigital*.35),Math.round(totalDigital*.2)],backgroundColor:['#1a7fc4','#5a3db8','#1aaa5c']}]},options:pieOpts('Digital Mode Split (Rs.L)')});
-  var digHeadLabels=['Property','Water'].concat(Object.keys(miscServices).map(function(k){return miscServices[k].label;}));
-  var digHeadVals=[propOnline,waterOnline].concat(Object.keys(miscServices).map(function(k){return sum(miscServices[k].online);}));
-  charts.digitalHead = new Chart(document.getElementById('digitalHeadBar'),{type:'bar',data:{labels:digHeadLabels,datasets:[{label:'Online Collection (Rs.L)',data:digHeadVals,backgroundColor:'rgba(26,127,196,.8)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},title:{display:true,text:'Digital Collection by Revenue Head (Rs.L)'}},scales:{y:{beginAtZero:true}}}});
-  var digCurr=digProp.map(function(v,i){return v+digWater[i]+digMisc[i];}), digPrev=digCurr.map(function(v){return Math.round(v*.8);});
-  charts.digitalYoY = new Chart(document.getElementById('digitalYoY'),{type:'bar',data:{labels:MONTHS,datasets:[
-    {label:getPrevFYLabel(),data:digPrev,backgroundColor:'rgba(180,190,200,.6)'},
-    {label:getCurrFYLabel(),data:digCurr,backgroundColor:'rgba(26,127,196,.8)'}
-  ]},options:barOpts('Digital Collections — Year-on-Year (Rs.L)')});
-
-  /* --- OUTSTANDING --- */
-  // buildOutstandingCharts(); // canvases commented out — skip
+  /* --- DIGITAL & OUTSTANDING rendered lazily on section open --- */
 }
 
 /* ===== OUTSTANDING SECTION ===== */
@@ -1112,6 +1087,173 @@ function buildOutstandingCharts() {
   }
 }
 
+/* ===== LAZY RENDER: DIGITAL ===== */
+function renderDigital() {
+  // Banner
+  var digProp  = propMoM.map(function(v){ return Math.round(v * .5); });
+  var digWater = waterMoM.map(function(v){ return Math.round(v * .45); });
+  var digMisc  = MONTHS.map(function(m, i){
+    var t = 0; Object.keys(miscServices).forEach(function(k){ t += miscServices[k].online[i]; }); return t;
+  });
+  var prevDigital = 5200; // Rs.52 Cr = 5200 L (FY 2024-25 actual)
+  var currDigital = sum(digProp) + sum(digWater) + sum(digMisc);
+  var digGrowth   = Math.round((currDigital - prevDigital) / prevDigital * 100);
+  var bannerEl    = document.getElementById('digitalCompareBanner');
+  if(bannerEl) bannerEl.innerHTML =
+    '<div class="digital-compare-item"><div class="digital-compare-label">FY 2024-25 Digital Collection</div><div class="digital-compare-val">\u20b952 Cr</div><div class="digital-compare-sub">Property + Water (Actual)</div></div>'
+    + '<div class="digital-compare-arrow">\u2192</div>'
+    + '<div class="digital-compare-item"><div class="digital-compare-label">FY '+activeFY+' Digital Collection</div><div class="digital-compare-val">'+fmt(currDigital)+'</div><div class="digital-compare-sub">Property + Water + Misc</div></div>'
+    + '<div class="digital-compare-growth">'+(digGrowth >= 0 ? '+' : '')+digGrowth+'% YoY</div>';
+
+  // Monthly trend chart
+  if(charts.digital) { charts.digital.destroy(); charts.digital = null; }
+  charts.digital = new Chart(document.getElementById('digitalMonthlyChart'), {
+    type: 'line',
+    data: { labels: MONTHS, datasets: [
+      {label:'Property Online', data:digProp,  borderColor:'#1a7fc4', backgroundColor:'rgba(26,127,196,.1)', fill:true, tension:.4},
+      {label:'Water Online',    data:digWater, borderColor:'#1aaa5c', backgroundColor:'rgba(26,170,92,.1)',  fill:true, tension:.4},
+      {label:'Misc Online',     data:digMisc,  borderColor:'#c98a00', backgroundColor:'rgba(201,138,0,.1)',  fill:true, tension:.4}
+    ]},
+    options: lineOpts('Digital Collections — Monthly Trend — FY '+activeFY+' (Rs. Lakhs)')
+  });
+
+  // Mode pie
+  if(charts.digitalMode) { charts.digitalMode.destroy(); charts.digitalMode = null; }
+  charts.digitalMode = new Chart(document.getElementById('digitalModePie'), {
+    type: 'doughnut',
+    data: { labels: ['Online Portal','UPI/QR','NEFT/RTGS'], datasets: [{
+      data: [Math.round(totalDigital*.45), Math.round(totalDigital*.35), Math.round(totalDigital*.2)],
+      backgroundColor: ['#1a7fc4','#5a3db8','#1aaa5c']
+    }]},
+    options: pieOpts('Digital Mode Split (Rs.L)')
+  });
+
+  // Head bar
+  var digHeadLabels = ['Property','Water'].concat(Object.keys(miscServices).map(function(k){ return miscServices[k].label; }));
+  var digHeadVals   = [propOnline, waterOnline].concat(Object.keys(miscServices).map(function(k){ return sum(miscServices[k].online); }));
+  if(charts.digitalHead) { charts.digitalHead.destroy(); charts.digitalHead = null; }
+  charts.digitalHead = new Chart(document.getElementById('digitalHeadBar'), {
+    type: 'bar',
+    data: { labels: digHeadLabels, datasets: [{
+      label: 'Online Collection (Rs.L)', data: digHeadVals, backgroundColor: 'rgba(26,127,196,.8)'
+    }]},
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top'}, title:{display:true, text:'Digital Collection by Revenue Head (Rs.L)'} },
+      scales:{ y:{beginAtZero:true} }
+    }
+  });
+
+  // YoY
+  var digCurr = digProp.map(function(v, i){ return v + digWater[i] + digMisc[i]; });
+  var digPrev = digCurr.map(function(v){ return Math.round(v * .8); });
+  if(charts.digitalYoY) { charts.digitalYoY.destroy(); charts.digitalYoY = null; }
+  charts.digitalYoY = new Chart(document.getElementById('digitalYoY'), {
+    type: 'bar',
+    data: { labels: MONTHS, datasets: [
+      {label: getPrevFYLabel(), data: digPrev, backgroundColor:'rgba(180,190,200,.6)'},
+      {label: getCurrFYLabel(), data: digCurr, backgroundColor:'rgba(26,127,196,.8)'}
+    ]},
+    options: barOpts('Digital Collections — Year-on-Year (Rs.L)')
+  });
+}
+
+/* ===== LAZY RENDER: OUTSTANDING ===== */
+function renderOutstanding() {
+  var propDemTotal  = sum(propDemand);
+  var waterDemTotal = sum(waterDemand);
+  var grandDemOut   = propDemTotal + waterDemTotal;
+
+  // Zone-level outstanding using actual collection arrays
+  var propOut  = propDemand.map(function(v, i){ return Math.max(0, v - propColl.all[i]); });
+  var waterOut = waterDemand.map(function(v, i){ return Math.max(0, v - waterColl.all[i]); });
+  var totalOut = WARDS.map(function(w, i){ return Math.round((propOut[i] + waterOut[i]) * 10) / 10; });
+
+  var propOutTotal  = sum(propOut);
+  var waterOutTotal = sum(waterOut);
+  var totalOutVal   = propOutTotal + waterOutTotal;
+  var collectedSoFar = propTotal + waterTotal;
+  var collEff = WARDS.map(function(w, i){
+    var dem = propDemand[i] + waterDemand[i];
+    var col = propColl.all[i] + waterColl.all[i];
+    return dem > 0 ? Math.round(col / dem * 100) : 0;
+  });
+
+  // Top banner
+  var bannerEl = document.getElementById('outBanner');
+  if(bannerEl) bannerEl.innerHTML = [
+    {label:'Total Outstanding',    val:fmtFull(totalOutVal),   sub:fmt(totalOutVal)+' of '+fmt(grandDemOut)+' demand', cls:'red'},
+    {label:'Property Outstanding', val:fmtFull(propOutTotal),  sub:fmt(propOutTotal),                                  cls:'amber'},
+    {label:'Water Outstanding',    val:fmtFull(waterOutTotal), sub:fmt(waterOutTotal),                                 cls:'amber'},
+    {label:'Collected So Far',     val:fmtFull(collectedSoFar),sub:fmt(collectedSoFar)+' collected',                   cls:'green'},
+    {label:'Collection Efficiency',val:pct(collectedSoFar, grandDemOut)+'%', sub:'Property + Water',                   cls:'blue'},
+    {label:'Recovery Potential',   val:fmtFull(totalOutVal),   sub:'Remaining FY',                                     cls:'blue'}
+  ].map(function(s){
+    return '<div class="out-banner-stat"><div class="out-banner-label">'+s.label+'</div>'
+      + '<div class="out-banner-value '+s.cls+'">'+s.val+'</div>'
+      + '<div class="out-banner-sub">'+s.sub+'</div></div>';
+  }).join('');
+
+  // Zone priority cards
+  var ranked = WARDS.map(function(w, i){
+    return {zone:w, propOut:propOut[i], waterOut:waterOut[i], total:totalOut[i], eff:collEff[i]};
+  }).sort(function(a, b){ return b.total - a.total; });
+
+  var gridEl = document.getElementById('outZoneGrid');
+  if(gridEl) gridEl.innerHTML = ranked.map(function(r, i){
+    var pClass   = i===0?'priority-1':i<=2?'priority-2':i<=4?'priority-3':'priority-low';
+    var rClass   = i===0?'r1':i<=2?'r2':i<=4?'r3':'rlow';
+    var effColor = r.eff>=50?'#1aaa5c':r.eff>=25?'#c98a00':'#c0202e';
+    var focus    = i===0?' \uD83C\uDFAF':i<=2?' \u26A0\uFE0F':'';
+    return '<div class="out-zone-card '+pClass+'">'
+      + '<div class="out-zone-card-rank '+rClass+'">'+(i+1)+'</div>'
+      + '<div class="out-zone-name">'+r.zone+focus+'</div>'
+      + '<div class="out-zone-amount">'+fmtFull(r.total)+'</div>'
+      + '<div class="out-zone-sub">'+fmt(r.total)+' outstanding</div>'
+      + '<div class="out-zone-sub">Prop: '+fmt(r.propOut)+' | Water: '+fmt(r.waterOut)+'</div>'
+      + '<div class="out-zone-eff" style="color:'+effColor+'">'+r.eff+'% efficiency</div>'
+      + '</div>';
+  }).join('');
+
+  // Zone ranked bar chart
+  var rankedLabels = ranked.map(function(r){ return r.zone; });
+  var rankedProp   = ranked.map(function(r){ return r.propOut; });
+  var rankedWater  = ranked.map(function(r){ return r.waterOut; });
+  if(charts.outZone) { charts.outZone.destroy(); charts.outZone = null; }
+  charts.outZone = new Chart(document.getElementById('outZoneRanked'), {
+    type: 'bar',
+    data: { labels: rankedLabels, datasets: [
+      {label:'Property Outstanding (Rs.L)', data:rankedProp,  backgroundColor:'rgba(192,32,46,.75)', stack:'a'},
+      {label:'Water Outstanding (Rs.L)',    data:rankedWater, backgroundColor:'rgba(201,138,0,.85)', stack:'a'}
+    ]},
+    options: barOpts('Outstanding by Zone — Ranked (Property + Water) — FY '+activeFY)
+  });
+
+  // Outstanding pie
+  if(charts.outPie) { charts.outPie.destroy(); charts.outPie = null; }
+  charts.outPie = new Chart(document.getElementById('outPie'), {
+    type: 'doughnut',
+    data: { labels: ['Property Outstanding','Water Outstanding','Collected'], datasets: [{
+      data: [propOutTotal, waterOutTotal, collectedSoFar],
+      backgroundColor: ['#c0202e','#c98a00','#1aaa5c']
+    }]},
+    options: pieOpts('Outstanding vs Collected Split (Rs.L) — FY '+activeFY)
+  });
+
+  // Efficiency bar
+  var effColors = collEff.map(function(e){ return e>=50?'rgba(26,170,92,.85)':e>=25?'rgba(201,138,0,.85)':'rgba(192,32,46,.85)'; });
+  if(charts.outEff) { charts.outEff.destroy(); charts.outEff = null; }
+  charts.outEff = new Chart(document.getElementById('outEffChart'), {
+    type: 'bar',
+    data: { labels: WARDS, datasets: [{
+      label: 'Collection Efficiency %', data: collEff, backgroundColor: effColors, borderRadius: 5
+    }]},
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, title:{display:true, text:'Collection Efficiency % per Zone — FY '+activeFY, font:{size:12}} },
+      scales:{ y:{min:0, max:100, title:{display:true, text:'%'}} }
+    }
+  });
+}
+
 /* ===== SWITCH FY ===== */
 function switchFY(fy, btn) {
   if(fy === activeFY) return;
@@ -1126,6 +1268,14 @@ function switchFY(fy, btn) {
   charts = {};
   createCharts();
   displayTable();
+  // Re-render lazy sections if currently visible
+  var activeSection = document.querySelector('.section.active');
+  if(activeSection) {
+    var sid = activeSection.id;
+    if(sid === 'digital')     renderDigital();
+    if(sid === 'outstanding') renderOutstanding();
+    if(sid === 'reports')     { renderZoneCount(); renderUsageWise(); renderDaywise(); }
+  }
 }
 
 /* ===== INITIAL RENDER ===== */
