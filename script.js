@@ -445,7 +445,7 @@ var MISC_SUB_SERVICES = {
     "Planetarium Entry Fee",
     "प्राणी संग्रहालय प्रवेश फी (Zoo Entry Fee)",
     "मत्स्यालय प्रवेश फी (Aquarium Entry Fee)",
-    "Playground Rent (क्रिडांगन भाडे)",
+    "Playground Rent (क्रीडांगण  भाडे)",
     "जलतरण तलाव सभासद फी (Swimming Pool Membership)",
     "वाचनालय सभासद नोंदणी फी (Library Membership)",
     "संग्रहालय प्रवेश फी (Museum Entry Fee — शिवाजी महाराज पुराणवस्तु संग्राहालय)",
