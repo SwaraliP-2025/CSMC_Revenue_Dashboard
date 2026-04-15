@@ -1676,18 +1676,17 @@ var DAYWISE_DATA = [];
 })();
 
 /* All report data is now ready — build reports */
-buildReports();
 
 /* ===== REPORT FUNCTIONS ===== */
+var rptPages = { 'rpt-zone-count':1, 'rpt-usage-wise':1, 'rpt-daywise':1 };
+var RPT_ROWS = 10;
+
 function showReport(id, btn) {
   document.querySelectorAll('.report-panel').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.report-tab').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
 }
-
-var rptPages = { 'rpt-zone-count':1, 'rpt-usage-wise':1, 'rpt-daywise':1 };
-var RPT_ROWS = 10;
 
 function buildReports() {
   renderZoneCount();
@@ -1766,6 +1765,9 @@ function filterReport(panel) {
 }
 
 /* Export CSV */
+/* buildReports() called here — after all render functions are defined */
+buildReports();
+
 function exportTableCSV(tableId, filename) {
   var rows = document.querySelectorAll('#'+tableId+' tr');
   var csv  = Array.from(rows).map(function(r){
