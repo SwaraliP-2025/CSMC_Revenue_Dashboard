@@ -1,37 +1,44 @@
-﻿
+﻿/* ===== GLOBAL CHARTS OBJECT — must be at top ===== */
+var charts = {};
+
 /* ===== NAVIGATION ===== */
 function showSection(id, label) {
   document.querySelectorAll(".section").forEach(function(s){ s.classList.remove("active"); });
   var el = document.getElementById(id);
   if(el) {
     el.classList.add("active");
-    // Scroll main to top
     var main = document.querySelector('.main');
     if(main) main.scrollTop = 0;
-    // Lazy render sections that were previously blank
-    if(id === 'digital')     renderDigital();
-    if(id === 'outstanding') renderOutstanding();
-    if(id === 'reports')     { renderZoneCount(); renderUsageWise(); renderDaywise(); }
-    if(id === 'rts')         buildRTSModule();
-    // Resize all charts in this section so they render correctly
+    // Safe lazy render with error isolation
+    if(id === 'digital'     && typeof renderDigital     === 'function') { try { renderDigital();     } catch(e){ console.error('renderDigital error:', e); } }
+    if(id === 'outstanding' && typeof renderOutstanding === 'function') { try { renderOutstanding(); } catch(e){ console.error('renderOutstanding error:', e); } }
+    if(id === 'reports') {
+      try { renderZoneCount();  } catch(e){ console.error('renderZoneCount error:', e); }
+      try { renderUsageWise();  } catch(e){ console.error('renderUsageWise error:', e); }
+      try { renderDaywise();    } catch(e){ console.error('renderDaywise error:', e); }
+    }
+    if(id === 'rts' && typeof buildRTSModule === 'function') { try { buildRTSModule(); } catch(e){ console.error('buildRTSModule error:', e); } }
+    // Resize charts after section is visible
     setTimeout(function(){
-      Object.keys(charts).forEach(function(k){
-        if(charts[k] && typeof charts[k].resize === 'function') {
-          try { charts[k].resize(); } catch(e){}
-        }
-      });
-    }, 50);
+      if(typeof charts !== 'undefined') {
+        Object.keys(charts).forEach(function(k){
+          if(charts[k] && typeof charts[k].resize === 'function') {
+            try { charts[k].resize(); } catch(e){}
+          }
+        });
+      }
+    }, 100);
   }
   var name = label || id.charAt(0).toUpperCase() + id.slice(1);
-  document.getElementById("breadcrumbTitle").textContent = name;
-  document.getElementById("breadcrumbLink").textContent  = name;
-  document.getElementById("breadcrumbCurrent").textContent = name;
+  var bt = document.getElementById("breadcrumbTitle"); if(bt) bt.textContent = name;
+  var bl = document.getElementById("breadcrumbLink");  if(bl) bl.textContent = name;
+  var bc = document.getElementById("breadcrumbCurrent"); if(bc) bc.textContent = name;
   document.querySelectorAll(".nav-btn").forEach(function(b){ b.classList.remove("active"); });
   var nb = document.getElementById("nav-" + id);
   if(nb) nb.classList.add("active");
   if(window.innerWidth <= 900){
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebarOverlay").classList.remove("active");
+    var sb = document.getElementById("sidebar"); if(sb) sb.classList.remove("open");
+    var ov = document.getElementById("sidebarOverlay"); if(ov) ov.classList.remove("active");
   }
 }
 function toggleSidebar() {
@@ -560,7 +567,6 @@ function buildMiscSection(key) {
 }
 function buildAllMiscSections(){ Object.keys(miscServices).forEach(buildMiscSection); }
 /* ===== CHART HELPERS ===== */
-var charts = {};
 function buildBarDS(dem, coll, mode) {
   var colors = {
     all:    'rgba(0,188,212,.85)',   // cyan — matches property card
@@ -1089,13 +1095,15 @@ function buildOutstandingCharts() {
 
 /* ===== LAZY RENDER: DIGITAL ===== */
 function renderDigital() {
-  // Banner
+  // Guard: check required data is available
+  if(!propMoM || !waterMoM || !miscServices) { console.error('renderDigital: data not ready'); return; }
+
   var digProp  = propMoM.map(function(v){ return Math.round(v * .5); });
   var digWater = waterMoM.map(function(v){ return Math.round(v * .45); });
   var digMisc  = MONTHS.map(function(m, i){
     var t = 0; Object.keys(miscServices).forEach(function(k){ t += miscServices[k].online[i]; }); return t;
   });
-  var prevDigital = 5200; // Rs.52 Cr = 5200 L (FY 2024-25 actual)
+  var prevDigital = 5200;
   var currDigital = sum(digProp) + sum(digWater) + sum(digMisc);
   var digGrowth   = Math.round((currDigital - prevDigital) / prevDigital * 100);
   var bannerEl    = document.getElementById('digitalCompareBanner');
@@ -1159,6 +1167,7 @@ function renderDigital() {
 
 /* ===== LAZY RENDER: OUTSTANDING ===== */
 function renderOutstanding() {
+  if(!propDemand || !propColl || !waterDemand || !waterColl) { console.error('renderOutstanding: data not ready'); return; }
   var propDemTotal  = sum(propDemand);
   var waterDemTotal = sum(waterDemand);
   var grandDemOut   = propDemTotal + waterDemTotal;
