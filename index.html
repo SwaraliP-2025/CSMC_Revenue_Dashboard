@@ -69,23 +69,29 @@
 
   <div class="nav-group">
     <div class="nav-group-title">Miscellaneous (Head Office)</div>
-    <button class="nav-btn" id="nav-misc-health"    onclick="showSection('misc-health','Health & Medical')">
+    <button class="nav-btn" id="nav-misc-water"      onclick="showSection('misc-water','Water Supply &amp; Sewerage')">
+      <span class="nav-icon"></span> Water Supply &amp; Sewerage
+    </button>
+    <button class="nav-btn" id="nav-misc-health"     onclick="showSection('misc-health','Health, Medical &amp; Veterinary')">
       <span class="nav-icon"></span> Health &amp; Medical
     </button>
-    <button class="nav-btn" id="nav-misc-civic"     onclick="showSection('misc-civic','Public &amp; Civic Amenities')">
-      <span class="nav-icon"></span> Civic Amenities
+    <button class="nav-btn" id="nav-misc-building"   onclick="showSection('misc-building','Building, Urban Planning &amp; Development')">
+      <span class="nav-icon"></span> Building &amp; Planning
     </button>
-    <button class="nav-btn" id="nav-misc-urban"     onclick="showSection('misc-urban','Urban Development')">
-      <span class="nav-icon"></span> Urban Development
+    <button class="nav-btn" id="nav-misc-licensing"  onclick="showSection('misc-licensing','Licensing, Permissions &amp; Legal')">
+      <span class="nav-icon"></span> Licensing &amp; Legal
     </button>
-    <button class="nav-btn" id="nav-misc-sanitation" onclick="showSection('misc-sanitation','Sanitation &amp; Environment')">
+    <button class="nav-btn" id="nav-misc-sanitation" onclick="showSection('misc-sanitation','Sanitation, Environment &amp; Waste')">
       <span class="nav-icon"></span> Sanitation &amp; Env.
     </button>
-    <button class="nav-btn" id="nav-misc-safety"    onclick="showSection('misc-safety','Public Safety &amp; Licensing')">
-      <span class="nav-icon"></span> Safety &amp; Licensing
+    <button class="nav-btn" id="nav-misc-parks"      onclick="showSection('misc-parks','Parks, Recreation, Tourism &amp; Culture')">
+      <span class="nav-icon"></span> Parks &amp; Recreation
     </button>
-    <button class="nav-btn" id="nav-misc-water"     onclick="showSection('misc-water','Water &amp; Infrastructure')">
-      <span class="nav-icon"></span> Water &amp; Infra
+    <button class="nav-btn" id="nav-misc-transport"  onclick="showSection('misc-transport','Transport, Parking &amp; Enforcement')">
+      <span class="nav-icon"></span> Transport &amp; Parking
+    </button>
+    <button class="nav-btn" id="nav-misc-finance"    onclick="showSection('misc-finance','Finance, Revenue, Grants &amp; Miscellaneous')">
+      <span class="nav-icon"></span> Finance &amp; Revenue
     </button>
   </div>
 
@@ -146,10 +152,10 @@
       <div class="kpi-full" id="kpi-misc-full"></div>
       <div class="kpi-short" id="kpi-misc-short"></div>
       <div class="kpi-divider"></div>
-      <div class="kpi-meta">6 service categories</div>
+      <div class="kpi-meta">8 service categories</div>
       <div class="kpi-meta" id="kpi-misc-eff"></div>
       <div class="kpi-badge yoy-up" id="kpi-misc-yoy">YoY</div>
-      <button class="kpi-more" onclick="showSection('misc-health','Health &amp; Medical')">More info </button>
+      <button class="kpi-more" onclick="showSection('misc-water','Water Supply &amp; Sewerage')">More info </button>
     </div>
 
     <div class="kpi-card kpi-digital">
@@ -160,7 +166,7 @@
       <div class="kpi-meta">Online + UPI + NEFT</div>
       <div class="kpi-meta" id="kpi-digital-pct"></div>
       <div class="kpi-badge yoy-up">Digital</div>
-      <button class="kpi-more" onclick="showSection('digital','Digital Collections')">More info ;</button>
+      <button class="kpi-more" onclick="showSection('digital','Digital Collections')">More info </button>
     </div>
 
     <div class="kpi-card kpi-outstanding">
@@ -295,13 +301,15 @@
   </div>
 </div>
 
-<!-- ===== MISC SECTIONS — 6 categories (Head Office) ===== -->
-<div id="misc-health"     class="section misc-section" data-key="misc-health"></div>
-<div id="misc-civic"      class="section misc-section" data-key="misc-civic"></div>
-<div id="misc-urban"      class="section misc-section" data-key="misc-urban"></div>
-<div id="misc-sanitation" class="section misc-section" data-key="misc-sanitation"></div>
-<div id="misc-safety"     class="section misc-section" data-key="misc-safety"></div>
+<!-- ===== MISC SECTIONS — 8 categories (Head Office) ===== -->
 <div id="misc-water"      class="section misc-section" data-key="misc-water"></div>
+<div id="misc-health"     class="section misc-section" data-key="misc-health"></div>
+<div id="misc-building"   class="section misc-section" data-key="misc-building"></div>
+<div id="misc-licensing"  class="section misc-section" data-key="misc-licensing"></div>
+<div id="misc-sanitation" class="section misc-section" data-key="misc-sanitation"></div>
+<div id="misc-parks"      class="section misc-section" data-key="misc-parks"></div>
+<div id="misc-transport"  class="section misc-section" data-key="misc-transport"></div>
+<div id="misc-finance"    class="section misc-section" data-key="misc-finance"></div>
 
 <!-- ===== RTS COLLECTIONS ===== -->
 <div id="rts" class="section">
@@ -364,7 +372,7 @@
 <!-- ===== DIGITAL COLLECTIONS ===== -->
 <div id="digital" class="section">
   <div class="section-header">
-    <h2>💻 Digital Collections</h2>
+    <h2> Digital Collections</h2>
     <div class="section-meta fy-meta" data-suffix="Online | UPI | NEFT/RTGS">Online | UPI | NEFT/RTGS | FY 2025-26</div>
   </div>
   <div id="digitalCompareBanner" class="digital-compare"></div>
