@@ -127,51 +127,51 @@ var FY_DATA = {
     // Property demand ~266Cr = 26,628L | Water demand ~31Cr = 3,107L
     propDemand:  [3107, 3606, 1712, 2441, 2972, 3368, 1878, 2766, 3344, 1434],
     propColl:    { online:[13,14,7,10,12,14,8,11,13,6], cash:[8,8,4,6,7,8,5,7,8,3], cheque:[5,6,3,4,5,5,3,4,5,2] },
-    propMoM:     [210,0,0,0,0,0,0,0,0,0,0,0],
+    propMoM:     [580,0,0,0,0,0,0,0,0,0,0,0],
     waterDemand: [362, 421, 200, 285, 347, 393, 219, 322, 391, 167],
     waterColl:   { online:[3,4,2,3,3,4,2,3,4,2], cash:[2,2,1,2,2,2,1,2,2,1], cheque:[1,1,1,1,1,1,1,1,1,1] },
-    waterMoM:    [53,0,0,0,0,0,0,0,0,0,0,0],
+    waterMoM:    [142,0,0,0,0,0,0,0,0,0,0,0],
     misc: {
       "misc-water":     { label:"Water Supply & Sewerage",                  icon:"", color:"#2d1b6e",
         demand:[68,0,0,0,0,0,0,0,0,0,0,0],
-        online:[28,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [28,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[12,0,0,0,0,0,0,0,0,0,0,0] },
+        online:[32,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [32,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[14,0,0,0,0,0,0,0,0,0,0,0] },
       "misc-health":    { label:"Health, Medical & Veterinary",             icon:"", color:"#c0202e",
         demand:[34,0,0,0,0,0,0,0,0,0,0,0],
-        online:[13,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [14,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 7,0,0,0,0,0,0,0,0,0,0,0] },
+        online:[15,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [16,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[ 8,0,0,0,0,0,0,0,0,0,0,0] },
       "misc-building":  { label:"Building, Urban Planning & Development",   icon:"", color:"#0d4f8a",
         demand:[54,0,0,0,0,0,0,0,0,0,0,0],
-        online:[22,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [22,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[10,0,0,0,0,0,0,0,0,0,0,0] },
+        online:[25,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [25,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[12,0,0,0,0,0,0,0,0,0,0,0] },
       "misc-licensing": { label:"Licensing, Permissions & Legal",           icon:"", color:"#7a5200",
         demand:[42,0,0,0,0,0,0,0,0,0,0,0],
-        online:[17,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [17,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 8,0,0,0,0,0,0,0,0,0,0,0] },
+        online:[19,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [19,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[ 9,0,0,0,0,0,0,0,0,0,0,0] },
       "misc-sanitation":{ label:"Sanitation, Environment & Waste",          icon:"", color:"#0a6b3a",
         demand:[14,0,0,0,0,0,0,0,0,0,0,0],
-        online:[ 6,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 6,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 2,0,0,0,0,0,0,0,0,0,0,0] },
+        online:[ 7,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [ 7,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[ 3,0,0,0,0,0,0,0,0,0,0,0] },
       "misc-parks":     { label:"Parks, Recreation, Tourism & Culture",     icon:"", color:"#1a7fc4",
         demand:[ 8,0,0,0,0,0,0,0,0,0,0,0],
-        online:[ 3,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 3,0,0,0,0,0,0,0,0,0,0,0],
+        online:[ 4,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [ 4,0,0,0,0,0,0,0,0,0,0,0],
         cheque:[ 2,0,0,0,0,0,0,0,0,0,0,0] },
       "misc-transport": { label:"Transport, Parking & Enforcement",         icon:"", color:"#5a3db8",
         demand:[ 4,0,0,0,0,0,0,0,0,0,0,0],
         online:[ 2,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 1,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [ 2,0,0,0,0,0,0,0,0,0,0,0],
         cheque:[ 1,0,0,0,0,0,0,0,0,0,0,0] },
       "misc-finance":   { label:"Finance, Revenue, Grants & Others", icon:"", color:"#b8860b",
         demand:[224,0,0,0,0,0,0,0,0,0,0,0],
-        online:[ 90,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 90,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 44,0,0,0,0,0,0,0,0,0,0,0] }
+        online:[100,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [100,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[ 50,0,0,0,0,0,0,0,0,0,0,0] }
     }
   },
   "2024-25": {
@@ -1019,6 +1019,48 @@ function createCharts() {
   buildRTSModule();
 
   /* --- DIGITAL & OUTSTANDING rendered lazily on section open --- */
+}
+
+/* ===== YoY FILTER ===== */
+function setYoYFilter(type, btn) {
+  document.querySelectorAll('.yoy-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+
+  var miscMonthly = MONTHS.map(function(m, i){
+    var t = 0; Object.keys(miscServices).forEach(function(k){ t += miscServices[k].all[i]; }); return t;
+  });
+  var miscMonthly_prev = MONTHS.map(function(m, i){
+    var prevFY = activeFY === "2025-26" ? FY_DATA["2024-25"] : null;
+    if(!prevFY) return Math.round(miscMonthly[i] * 0.85);
+    var t = 0; Object.keys(prevFY.misc).forEach(function(k){ t += prevFY.misc[k].all[i]; }); return t;
+  });
+
+  var currData, prevData, title;
+  if(type === 'property') {
+    currData = propMoM; prevData = propMoM_prev;
+    title = 'Year-on-Year — Property Tax (Rs. Lakhs)';
+  } else if(type === 'water') {
+    currData = waterMoM; prevData = waterMoM_prev;
+    title = 'Year-on-Year — Water Tax (Rs. Lakhs)';
+  } else if(type === 'misc') {
+    currData = miscMonthly; prevData = miscMonthly_prev;
+    title = 'Year-on-Year — Miscellaneous (Rs. Lakhs)';
+  } else if(type === 'all') {
+    currData = propMoM.map(function(v, i){ return v + waterMoM[i] + miscMonthly[i]; });
+    prevData = propMoM_prev.map(function(v, i){ return v + waterMoM_prev[i] + miscMonthly_prev[i]; });
+    title = 'Year-on-Year — All Collections (Rs. Lakhs)';
+  } else { // prop-water (default)
+    currData = propMoM.map(function(v, i){ return v + waterMoM[i]; });
+    prevData = propMoM_prev.map(function(v, i){ return v + waterMoM_prev[i]; });
+    title = 'Year-on-Year Comparison — Property + Water (Rs. Lakhs)';
+  }
+
+  if(charts.overviewYoY) {
+    charts.overviewYoY.data.datasets[0].data = prevData;
+    charts.overviewYoY.data.datasets[1].data = currData;
+    charts.overviewYoY.options.plugins.title.text = title;
+    charts.overviewYoY.update();
+  }
 }
 
 /* ===== OUTSTANDING SECTION ===== */

@@ -194,7 +194,16 @@
     <div class="chart-box full-width h300"><canvas id="overviewZoneChart"></canvas></div>
     <div class="chart-box h300"><canvas id="overviewMonthlyTrend"></canvas></div>
     <div class="chart-box h300"><canvas id="overviewMiscBreakdown"></canvas></div>
-    <div class="chart-box h300"><canvas id="overviewYoY"></canvas></div>
+    <div class="chart-box h300">
+      <div style="display:flex;justify-content:flex-end;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
+        <button class="yoy-filter-btn active" onclick="setYoYFilter('prop-water',this)">Property + Water</button>
+        <button class="yoy-filter-btn" onclick="setYoYFilter('property',this)">Property</button>
+        <button class="yoy-filter-btn" onclick="setYoYFilter('water',this)">Water</button>
+        <button class="yoy-filter-btn" onclick="setYoYFilter('misc',this)">Misc</button>
+        <button class="yoy-filter-btn" onclick="setYoYFilter('all',this)">All</button>
+      </div>
+      <canvas id="overviewYoY"></canvas>
+    </div>
   </div>
 </div>
 

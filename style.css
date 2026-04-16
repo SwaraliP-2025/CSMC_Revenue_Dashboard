@@ -330,3 +330,8 @@ tfoot td{font-weight:700;background:#f0f4f8;color:#0d2137;padding:8px 12px;borde
 .digital-compare-sub{font-size:.68rem;opacity:.65;}
 .digital-compare-arrow{font-size:2rem;opacity:.5;-ms-flex-negative:0;flex-shrink:0;}
 .digital-compare-growth{background:rgba(6,214,160,.2);border-radius:20px;padding:4px 14px;font-size:.8rem;font-weight:700;color:#06d6a0;white-space:nowrap;}
+
+/* ===== YoY FILTER BUTTONS ===== */
+.yoy-filter-btn{padding:3px 10px;border:1px solid #d0d7de;border-radius:12px;background:#f5f7fa;color:#555;cursor:pointer;font-size:.7rem;font-weight:600;transition:all .15s;}
+.yoy-filter-btn:hover{border-color:#1a3a5c;background:#eef2f5;color:#1a3a5c;}
+.yoy-filter-btn.active{background:#1a3a5c;color:#fff;border-color:#1a3a5c;}

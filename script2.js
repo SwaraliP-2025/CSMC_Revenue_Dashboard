@@ -1009,7 +1009,7 @@ var ZONE4_REAL = [
    ------------------------------------------------------- */
 var z4TotalDemand     = ZONE4_REAL.reduce(function(a,r){ return a+r.totalDemand; }, 0);
 var z4TotalColl       = ZONE4_REAL.reduce(function(a,r){ return a+r.totalColl;   }, 0);
-var z4CollectionRate  = z4TotalDemand > 0 ? z4TotalColl / z4TotalDemand : 0.23; // ~23% from real data
+var z4CollectionRate  = z4TotalDemand > 0 ? z4TotalColl / z4TotalDemand : 0.23; 
 var z4ArrearsRatio    = ZONE4_REAL.reduce(function(a,r){ return a+r.arrears;  },0) / z4TotalDemand;
 var z4CurrentRatio    = ZONE4_REAL.reduce(function(a,r){ return a+r.current;  },0) / z4TotalDemand;
 var z4PenaltyRatio    = ZONE4_REAL.reduce(function(a,r){ return a+r.penalty;  },0) / z4TotalDemand;
