@@ -1,7 +1,4 @@
-/* ===== GLOBAL CHARTS OBJECT — must be at top ===== */
-var charts = {};
-var rptPages = { 'rpt-zone-count':1, 'rpt-usage-wise':1, 'rpt-daywise':1 };
-var RPT_ROWS = 10;
+﻿/* CSMC Revenue Dashboard - script.js */
 
 /* ===== NAVIGATION ===== */
 function showSection(id, label) {
@@ -9,71 +6,28 @@ function showSection(id, label) {
   var el = document.getElementById(id);
   if(el) {
     el.classList.add("active");
+    // Scroll main to top
     var main = document.querySelector('.main');
     if(main) main.scrollTop = 0;
-    
-    // Safe lazy render with error isolation + data readiness checks
-    if(id === 'digital') {
-      if(typeof renderDigital === 'function') {
-        try { renderDigital(); } catch(e){ 
-          console.error('renderDigital error:', e); 
-          showErrorMessage('digital'); 
-        }
-      } else {
-        showErrorMessage('digital');
-      }
-    }
-    if(id === 'outstanding') {
-      if(typeof renderOutstanding === 'function') {
-        try { renderOutstanding(); } catch(e){ 
-          console.error('renderOutstanding error:', e); 
-          showErrorMessage('outstanding'); 
-        }
-      } else {
-        showErrorMessage('outstanding');
-      }
-    }
-    if(id === 'reports') {
-      if(typeof renderZoneCount === 'function') {
-        try { renderZoneCount(); } catch(e){ console.error('renderZoneCount error:', e); }
-      }
-      if(typeof renderUsageWise === 'function') {
-        try { renderUsageWise(); } catch(e){ console.error('renderUsageWise error:', e); }
-      }
-      if(typeof renderDaywise === 'function') {
-        try { renderDaywise(); } catch(e){ console.error('renderDaywise error:', e); }
-      }
-    }
-    if(id === 'rts' && typeof buildRTSModule === 'function') { 
-      try { buildRTSModule(); } catch(e){ 
-        console.error('buildRTSModule error:', e); 
-        showErrorMessage('rts'); 
-      } 
-    }
-    
-    // Resize charts after section is visible (with better safety)
+    // Resize all charts in this section so they render correctly
     setTimeout(function(){
-      if(typeof charts !== 'undefined' && charts && Object.keys(charts).length > 0) {
-        Object.keys(charts).forEach(function(k){
-          if(charts[k] && typeof charts[k].resize === 'function') {
-            try { charts[k].resize(); } catch(e){ console.warn('Chart resize failed:', k, e); }
-          }
-        });
-      }
-    }, 150); // Slightly longer delay for complex renders
+      Object.keys(charts).forEach(function(k){
+        if(charts[k] && typeof charts[k].resize === 'function') {
+          try { charts[k].resize(); } catch(e){}
+        }
+      });
+    }, 50);
   }
-  
   var name = label || id.charAt(0).toUpperCase() + id.slice(1);
-  var bt = document.getElementById("breadcrumbTitle"); if(bt) bt.textContent = name;
-  var bl = document.getElementById("breadcrumbLink");  if(bl) bl.textContent = name;
-  var bc = document.getElementById("breadcrumbCurrent"); if(bc) bc.textContent = name;
+  document.getElementById("breadcrumbTitle").textContent = name;
+  document.getElementById("breadcrumbLink").textContent  = name;
+  document.getElementById("breadcrumbCurrent").textContent = name;
   document.querySelectorAll(".nav-btn").forEach(function(b){ b.classList.remove("active"); });
   var nb = document.getElementById("nav-" + id);
   if(nb) nb.classList.add("active");
-  
   if(window.innerWidth <= 900){
-    var sb = document.getElementById("sidebar"); if(sb) sb.classList.remove("open");
-    var ov = document.getElementById("sidebarOverlay"); if(ov) ov.classList.remove("active");
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebarOverlay").classList.remove("active");
   }
 }
 function toggleSidebar() {
@@ -132,46 +86,36 @@ var FY_DATA = {
     waterColl:   { online:[3,4,2,3,3,4,2,3,4,2], cash:[2,2,1,2,2,2,1,2,2,1], cheque:[1,1,1,1,1,1,1,1,1,1] },
     waterMoM:    [53,0,0,0,0,0,0,0,0,0,0,0],
     misc: {
-      "misc-water":     { label:"Water Supply & Sewerage",                  icon:"", color:"#2d1b6e",
-        demand:[68,0,0,0,0,0,0,0,0,0,0,0],
-        online:[28,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [28,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[12,0,0,0,0,0,0,0,0,0,0,0] },
-      "misc-health":    { label:"Health, Medical & Veterinary",             icon:"", color:"#c0202e",
-        demand:[34,0,0,0,0,0,0,0,0,0,0,0],
-        online:[13,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [14,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 7,0,0,0,0,0,0,0,0,0,0,0] },
-      "misc-building":  { label:"Building, Urban Planning & Development",   icon:"", color:"#0d4f8a",
-        demand:[54,0,0,0,0,0,0,0,0,0,0,0],
-        online:[22,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [22,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[10,0,0,0,0,0,0,0,0,0,0,0] },
-      "misc-licensing": { label:"Licensing, Permissions & Legal",           icon:"", color:"#7a5200",
-        demand:[42,0,0,0,0,0,0,0,0,0,0,0],
-        online:[17,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [17,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 8,0,0,0,0,0,0,0,0,0,0,0] },
-      "misc-sanitation":{ label:"Sanitation, Environment & Waste",          icon:"", color:"#0a6b3a",
-        demand:[14,0,0,0,0,0,0,0,0,0,0,0],
-        online:[ 6,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 6,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 2,0,0,0,0,0,0,0,0,0,0,0] },
-      "misc-parks":     { label:"Parks, Recreation, Tourism & Culture",     icon:"", color:"#1a7fc4",
-        demand:[ 8,0,0,0,0,0,0,0,0,0,0,0],
-        online:[ 3,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 3,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 2,0,0,0,0,0,0,0,0,0,0,0] },
-      "misc-transport": { label:"Transport, Parking & Enforcement",         icon:"", color:"#5a3db8",
-        demand:[ 4,0,0,0,0,0,0,0,0,0,0,0],
-        online:[ 2,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 1,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 1,0,0,0,0,0,0,0,0,0,0,0] },
-      "misc-finance":   { label:"Finance, Revenue, Grants & Others", icon:"", color:"#b8860b",
-        demand:[224,0,0,0,0,0,0,0,0,0,0,0],
-        online:[ 90,0,0,0,0,0,0,0,0,0,0,0],
-        cash:  [ 90,0,0,0,0,0,0,0,0,0,0,0],
-        cheque:[ 44,0,0,0,0,0,0,0,0,0,0,0] }
+      "misc-health":    { label:"Health & Medical (OPD)",      icon:"", color:"#c0202e",
+        demand:[18,20,17,22,19,24,21,26,23,28,25,30],
+        online:[6,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [7,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[3,0,0,0,0,0,0,0,0,0,0,0] },
+      "misc-civic":     { label:"Public & Civic Amenities",    icon:"", color:"#1a7fc4",
+        demand:[12,14,11,15,13,16,14,17,15,18,16,20],
+        online:[4,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [5,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[1,0,0,0,0,0,0,0,0,0,0,0] },
+      "misc-urban":     { label:"Urban Development & Planning",icon:"", color:"#0d4f8a",
+        demand:[25,28,22,30,26,32,28,35,31,37,33,40],
+        online:[11,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [13,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[5,0,0,0,0,0,0,0,0,0,0,0] },
+      "misc-sanitation":{ label:"Sanitation & Environment",    icon:"",       color:"#0a6b3a",
+        demand:[10,11, 9,12,10,13,11,14,12,15,13,16],
+        online:[4,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [5,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[1,0,0,0,0,0,0,0,0,0,0,0] },
+      "misc-safety":    { label:"Public Safety & Licensing",   icon:"", color:"#7a5200",
+        demand:[15,17,14,19,16,20,18,22,19,23,21,25],
+        online:[7,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [8,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[3,0,0,0,0,0,0,0,0,0,0,0] },
+      "misc-water":     { label:"Water & Infrastructure",      icon:"", color:"#2d1b6e",
+        demand:[20,22,18,24,21,26,23,28,25,30,27,32],
+        online:[8,0,0,0,0,0,0,0,0,0,0,0],
+        cash:  [9,0,0,0,0,0,0,0,0,0,0,0],
+        cheque:[4,0,0,0,0,0,0,0,0,0,0,0] }
     }
   },
   "2024-25": {
@@ -180,59 +124,49 @@ var FY_DATA = {
     // Water: 22.8Cr collected at 77% eff → demand ~29.6Cr = 2,960L
     propDemand:  [2959, 3434, 1630, 2325, 2830, 3208, 1789, 2634, 3185, 1366],
     propColl: {
-      online: [548, 636, 302, 430, 524, 594, 331, 488, 590, 253],
-      cash:   [1195,1387, 659, 939,1143,1296, 722,1064,1286, 552],
-      cheque: [ 747, 867, 412, 587, 714, 810, 452, 665, 804, 345]
+      online: [1170,1358,645,919,1119,1269,707,1042,1260,540],
+      cash:   [ 697, 809,384,548, 667, 756,421, 620, 750,322],
+      cheque: [ 623, 723,343,489, 595, 675,376, 554, 670,287]
     },
     propMoM:     [3300, 3000, 2800, 1900, 1700, 1600, 1600, 1500, 1400, 1300, 1200, 1100],
     waterDemand: [345, 401, 190, 271, 330, 374, 209, 307, 372, 159],
     waterColl: {
-      online: [ 59, 68, 32, 46, 56, 63, 35, 52, 63, 27],
-      cash:   [128,148, 70,100,122,138, 77,114,138, 59],
-      cheque: [ 80, 93, 44, 63, 76, 86, 48, 71, 86, 37]
+      online: [120,139,66,94,114,130,72,107,129,55],
+      cash:   [ 80, 93,44,63, 76, 86,48, 71, 86,37],
+      cheque: [ 67, 77,37,52, 64, 72,40, 59, 72,31]
     },
     waterMoM: [800, 700, 600, 400, 300, 300, 300, 200, 200, 200, 200, 200],
     misc: {
-      "misc-water":     { label:"Water Supply & Sewerage",                  icon:"", color:"#2d1b6e",
-        demand:[ 72, 84, 60, 80, 74, 88, 68, 82, 78, 90, 84, 96],
-        online:[ 25, 29, 21, 28, 26, 31, 24, 29, 27, 32, 30, 34],
-        cash:  [ 28, 32, 23, 30, 27, 33, 25, 31, 29, 34, 31, 36],
-        cheque:[ 12, 14, 10, 13, 12, 14, 11, 13, 12, 15, 13, 16] },
-      "misc-health":    { label:"Health, Medical & Veterinary",             icon:"", color:"#c0202e",
-        demand:[ 35, 41, 29, 39, 36, 43, 33, 40, 38, 45, 41, 50],
-        online:[ 12, 14, 10, 13, 12, 15, 11, 14, 13, 16, 14, 17],
-        cash:  [ 14, 16, 11, 15, 13, 17, 12, 15, 14, 17, 15, 19],
-        cheque:[  6,  7,  5,  7,  6,  7,  5,  7,  6,  8,  7,  8] },
-      "misc-building":  { label:"Building, Urban Planning & Development",   icon:"", color:"#0d4f8a",
-        demand:[ 57, 66, 47, 63, 58, 70, 54, 65, 62, 73, 66, 79],
-        online:[ 20, 23, 16, 22, 20, 24, 19, 23, 21, 26, 23, 27],
-        cash:  [ 22, 25, 18, 24, 22, 26, 20, 24, 23, 27, 25, 29],
-        cheque:[  9, 10,  7,  9,  9, 11,  8, 10,  9, 11, 10, 12] },
-      "misc-licensing": { label:"Licensing, Permissions & Legal",           icon:"", color:"#7a5200",
-        demand:[ 44, 51, 36, 48, 44, 53, 41, 50, 47, 56, 51, 61],
-        online:[ 15, 18, 13, 17, 15, 18, 14, 17, 16, 19, 18, 21],
-        cash:  [ 16, 19, 13, 18, 16, 19, 15, 18, 17, 20, 18, 22],
-        cheque:[  7,  8,  5,  7,  7,  8,  6,  8,  7,  9,  8, 10] },
-      "misc-sanitation":{ label:"Sanitation, Environment & Waste",          icon:"", color:"#0a6b3a",
-        demand:[ 15, 17, 12, 16, 15, 18, 14, 17, 16, 19, 17, 20],
-        online:[  5,  6,  4,  6,  5,  6,  5,  6,  5,  7,  6,  7],
-        cash:  [  6,  7,  5,  6,  5,  7,  5,  6,  6,  7,  6,  8],
-        cheque:[  2,  2,  2,  2,  2,  2,  2,  2,  2,  3,  2,  3] },
-      "misc-parks":     { label:"Parks, Recreation, Tourism & Culture",     icon:"", color:"#1a7fc4",
-        demand:[  8,  9,  6,  8,  8,  9,  7,  9,  8, 10,  9, 11],
-        online:[  3,  3,  2,  3,  3,  3,  2,  3,  3,  4,  3,  4],
-        cash:  [  3,  3,  2,  3,  2,  3,  2,  3,  3,  3,  3,  4],
-        cheque:[  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  2] },
-      "misc-transport": { label:"Transport, Parking & Enforcement",         icon:"", color:"#5a3db8",
-        demand:[  4,  4,  3,  4,  4,  4,  3,  4,  4,  5,  4,  5],
-        online:[  1,  2,  1,  2,  1,  2,  1,  2,  1,  2,  2,  2],
-        cash:  [  2,  2,  1,  2,  1,  2,  1,  2,  2,  2,  1,  2],
-        cheque:[  0,  1,  0,  1,  0,  1,  0,  1,  0,  1,  0,  1] },
-      "misc-finance":   { label:"Finance, Revenue, Grants & Others", icon:"", color:"#b8860b",
-        demand:[234,271,193,259,238,285,220,265,252,299,271,313],
-        online:[ 82, 95, 68, 91, 83,100, 77, 93, 88,105, 95,110],
-        cash:  [ 82, 95, 68, 91, 83,100, 77, 93, 88,105, 95,110],
-        cheque:[ 40, 46, 33, 44, 40, 48, 37, 45, 43, 51, 46, 53] }
+      "misc-health":    { label:"Health & Medical (OPD)",      icon:"", color:"#c0202e",
+        demand:[16,18,15,20,17,22,19,24,21,26,23,28],
+        online:[ 5, 6, 5, 7, 6, 8, 7, 9, 8,10, 9,11],
+        cash:  [ 7, 8, 6, 9, 7,10, 8,11, 9,12,10,13],
+        cheque:[ 2, 2, 2, 2, 2, 2, 2, 3, 2, 3, 2, 3] },
+      "misc-civic":     { label:"Public & Civic Amenities",    icon:"", color:"#1a7fc4",
+        demand:[10,12, 9,13,11,14,12,15,13,16,14,18],
+        online:[ 3, 4, 3, 4, 4, 5, 4, 5, 5, 6, 5, 7],
+        cash:  [ 3, 4, 3, 4, 3, 4, 3, 5, 4, 5, 4, 6],
+        cheque:[ 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] },
+      "misc-urban":     { label:"Urban Development & Planning",icon:"", color:"#0d4f8a",
+        demand:[22,25,20,27,23,29,25,31,28,33,30,36],
+        online:[ 7, 8, 6, 9, 8,10, 8,11, 9,12,10,13],
+        cash:  [ 8, 9, 7,10, 8,11, 9,12,10,13,11,14],
+        cheque:[ 3, 4, 3, 4, 3, 4, 4, 5, 4, 5, 4, 6] },
+      "misc-sanitation":{ label:"Sanitation & Environment",    icon:"",       color:"#0a6b3a",
+        demand:[ 9,10, 8,11, 9,12,10,13,11,14,12,15],
+        online:[ 3, 3, 2, 3, 3, 4, 3, 4, 3, 5, 4, 5],
+        cash:  [ 3, 4, 3, 4, 3, 4, 3, 5, 4, 5, 4, 5],
+        cheque:[ 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2] },
+      "misc-safety":    { label:"Public Safety & Licensing",   icon:"", color:"#7a5200",
+        demand:[13,15,12,17,14,18,16,20,17,21,19,23],
+        online:[ 4, 5, 4, 6, 5, 6, 5, 7, 6, 7, 6, 8],
+        cash:  [ 5, 6, 4, 6, 5, 7, 6, 8, 6, 8, 7, 9],
+        cheque:[ 2, 2, 2, 2, 2, 2, 2, 3, 2, 3, 2, 3] },
+      "misc-water":     { label:"Water & Infrastructure",      icon:"", color:"#2d1b6e",
+        demand:[18,20,16,22,19,24,21,26,23,28,25,30],
+        online:[ 6, 7, 5, 8, 6, 9, 7, 9, 8,10, 9,11],
+        cash:  [ 6, 7, 5, 7, 6, 8, 7, 9, 8, 9, 8,10],
+        cheque:[ 3, 3, 2, 3, 3, 3, 3, 4, 3, 4, 3, 4] }
     }
   }
 };
@@ -371,182 +305,49 @@ function refreshStatStrips(fy) {
 }
 
 var MISC_SUB_SERVICES = {
-  "misc-water": [
-    "31 मार्च पर्यंतची थकबाकी (पाणीपट्टी)",
-    "31 मार्च पर्यंतची थकबाकीपैकी वसुली (पाणीपट्टी)",
-    "अवैध नळ नियमित करणे शुल्क वसुली",
-    "नवीन नळ जोडणी (बोरिंग फी)",
-    "नवीन नळ जोडणी अग्रिम व मीटर अनामत",
-    "पाणी पुरवठा इतर अनामत",
-    "पाणी विक्री टँकर भाडे (Tanker Charges)",
-    "पाण्याचा अपव्यय बाबत दंड",
-    "पाणी पट्टी वसुली जायकवाडी ग्राहक",
-    "Sale of Treated Sewage Water Fees",
-    "जलनि:स्सारण वाहिनी जोडणी फी",
-    "जलनि:स्सारण वाहिनी जोडणी व इतर अग्रीम",
-    "प्लंबर परवाना फी (पाणी पुरवठा व जलनि:स्सारण विभाग)"
-  ],
   "misc-health": [
-    "NURSING TRAINING FEE (HEALTH)",
-    "HEALTH CERTIFICATE FEE (HEALTH)",
-    "जन्म व मृत्यु फी",
-    "OPD Meltron (DCHC)",
-    "ओ पी डी (शिवाजी नगर)",
-    "ओ.पी.डी. फिस (AAREF COLONY)",
-    "ओ.पी.डी. फिस (GANESH COLONY)",
-    "ओ.पी.डी. फिस (अंबिका नगर)",
-    "ओ.पी.डी फिस (औरंगापुरा)",
-    "ओ.पी.डी. फिस (कांचनवाडी)",
-    "ओ.पी.डी. फिस (कैलास नगर, दादा कॉलनी)",
-    "ओ.पी.डी. फिस (कैसर कॉलनी)",
-    "ओ.पी.डी. फिस (क्रांती चौक)",
-    "ओ.पी.डी. फिस (गरम पाणी)",
-    "ओ.पी.डी. फिस (चिकलठाणा)",
-    "ओ.पी.डी. फिस (चेतना नगर)",
-    "ओ.पी.डी फिस (जय भवानी नगर)",
-    "ओ.पी.डी. फिस (जवाहर कॉलनी)",
-    "ओ.पी.डी. फिस (जिंन्सी)",
-    "ओ.पी.डी. फिस (जुना बाजार)",
-    "ओ.पी.डी. फिस (देवळाई)",
-    "ओ.पी.डी. फिस (नक्षत्रवाडी)",
-    "ओ.पी.डी. फिस (नारेगाव)",
-    "ओ.पी.डी. फिस (नेहरु नगर)",
-    "ओ.पी.डी. फिस (पीर बाजार)",
-    "ओ.पी.डी. फिस (पुंडलिक नगर)",
-    "ओ.पी.डी. फिस (बन्सीलाल नगर)",
-    "ओ.पी.डी. फिस (बायजीपुरा)",
-    "ओ.पी.डी. फिस (भवानी नगर)",
-    "ओ.पी.डी. फिस (भिमनगर)",
-    "ओ.पी.डी. फिस (मसनतपुर)",
-    "ओ.पी.डी. फिस (मुकुंदवाडी)",
-    "ओ.पी.डी. फिस (राज नगर)",
-    "ओ.पी.डी फिस (विजय नगर)",
-    "ओ.पी.डी. फिस (सातारा)",
-    "ओ.पी.डी. फिस (सादातनगर)",
-    "ओ.पी.डी. फिस (सिडको एन 11)",
-    "ओ.पी.डी. फिस (सिडको एन-8)",
-    "ओ.पी.डी. फिस (सिल्क मील कॉलनी)",
-    "ओ.पी.डी. फिस (हर्ष नगर)",
-    "ओ.पी.डी. फिस (हर्सुल)",
-    "ओ. पी. डी. फीस काबीर नगर",
-    "ओ.पी.डी. फीस (जिंसी नविन)",
-    "ओ पी डी फीस (मिसारवाडी)",
-    "पशु वैद्यकीय सेवा व फी",
-    "Ambulance and other Vehicle शुल्क",
-    "AMBULANCE CHARGES",
-    "बायोमेडीकल वेस्ट प्रकल्प सभासद नोंदणी फी",
-    "प्रसुती ग्रह/दवाखाना नोंदणी फी",
-    "श्वान दंश प्रतिबंध योजना कर्मचारी खर्च प्रतिपुर्ती"
+    "OPD Fees — Shivaji Nagar","OPD Fees — Satara","OPD Fees — Saadat Nagar",
+    "OPD Fees — Cidco N-11","OPD Fees — Cidco N-8","OPD Fees — Silk Mill Colony",
+    "OPD Fees — Harsh Nagar","OPD Fees — Harsul","OPD Fees — Kabir Nagar",
+    "OPD Fees — Jinsi (New)","OPD Fees — Misarwadi"
   ],
-  "misc-building": [
-    "LDC (जमीन विकास शुल्क)",
-    "नगर रचना बांधकाम अनामत",
-    "बांधकाम परवाना व इतर फी",
-    "बांधकाम परवाना नियमित दंड",
-    "प्रिमीयम रक्कम जमा (इमारत नियमितकरण प्रिमीयम)",
-    "अतिक्रमणे, अनधिकृत बांधकामे पाडणे व खर्च वसुली",
-    "रोडरोलर / जेसीबी भाडे",
-    "फेर फार नकाशे व इतर फी",
-    "गुंठेवारी कायदाअंतर्गत वसुली",
-    "गुंठेवारी विकास विविध विकास कामे"
+  "misc-civic": [
+    "Playground Rent (क्रिडांगन भाडे)","Theater Rent (नाट्यगृह भाडे)",
+    "Building Rent (इमारत भाडे)","Land / Stall Rent (जमीन भाडे / टपरी भाडे)",
+    "Swimming Pool Membership Fees","Zoo Entry Fees (प्राणी संग्रहालय)",
+    "Aquarium Entry Fees (मत्स्यालय)","Adventure Park Royalty (Chhatrapati Sambhaji Maharaj)"
   ],
-  "misc-licensing": [
-    "NA Tax (अकृषीक कर)",
-    "नामांतर शुल्क",
-    "नाहरकत प्रमाणपत्र नुतनीकरण फी",
-    "आगीचे नाहरकत प्रमाणपत्र फी",
-    "आगीपासुन प्रमाणपत्र फी",
-    "मांस परवाना (मटन, फिश, चिकन, बीफ)",
-    "इतर परवाना फी",
-    "Pitch Parwana",
-    "Tender Form Fees",
-    "टेंडर फोर्म",
-    "True Copy Fee",
-    "शोधनावळ व नक्कल फी",
-    "एल.बी.टी. मुद्रांक शुल्क",
-    "नाहरकत प्रमाणपत्र नुतनीकरण फी (Renewal NOC)",
-    "आगीपासुन संरक्षण प्रमाणपत्र फी",
-    "प्लंबर परवाना फी",
-    "विवाह नोंदणी फी (Marriage Registration)",
-    "जाहिरात बोर्ड परवाना (Hoarding/Advertisement Board)"
+  "misc-urban": [
+    "Gunthewari Development (वसुली / विकास कामे)",
+    "Building Permission Fees (नगर रचना बांधकाम अनामत)",
+    "Building Regularization Premiums (इमारत नियमितकरण प्रिमीयम)",
+    "Fines for Illegal Construction (बांधकाम परवाना नियमित दंड)"
   ],
   "misc-sanitation": [
-    "नागरी घन कचरा व्यवस्थापन Fine & Fees",
-    "सेप्टीक टॅंक साफ करणे वसुली",
-    "फायर कॉल चार्जेस (Fire Call Charges)",
-    "FIRE OTHER",
-    "FSD",
-    "फायर फंड (अग्निशमन निधी)",
-    "झाडे तोडणे / छाटणे शुल्क (Tree Felling / Trimming)"
+    "Solid Waste Management Fines & Fees (नागरी घन कचरा व्‍यवस्‍थापन)",
+    "Bio-Medical Waste Registration Fees (नोंदणी फी)",
+    "Treated Sewage Water Fees",
+    "Sale of Trees & Flowers (झाडे व फुले विक्री)"
   ],
-  "misc-parks": [
-    "KAMAL TALAV GARDEN ENTRY FEE",
-    "MAHARANA PRATAP GARDEN ENTRY FEE",
-    "Siddhartha Garden Entry Fee",
-    "Siddhartha Garden Mini Train Royalty",
-    "Rubber Water Tank Royalty (BOT)",
-    "SWAMI VIVEKANAND MINI TRAIN",
-    "Swami Vivekanand Adventure Park Entry Fee",
-    "Botanical Garden Entry Fee",
-    "Botanical Garden Mini Train Royalty",
-    "Planetarium Entry Fee",
-    "प्राणी संग्रहालय प्रवेश फी (Zoo Entry Fee)",
-    "मत्स्यालय प्रवेश फी (Aquarium Entry Fee)",
-    "Playground Rent (क्रीडांगण  भाडे)",
-    "जलतरण तलाव सभासद फी (Swimming Pool Membership)",
-    "वाचनालय सभासद नोंदणी फी (Library Membership)",
-    "संग्रहालय प्रवेश फी (Museum Entry Fee — शिवाजी महाराज पुराणवस्तु संग्राहालय)",
-    "नाट्यगृह भाडे (Theater / Natyagriha Rent)",
-    "सांस्कृतिक कार्यक्रम परवानगी (Cultural Event Permission)",
-    "छायाचित्रण / चित्रीकरण परवानगी (Photography / Filming Permission)",
-    "उद्यान / मैदान आरक्षण (Park / Ground Booking)"
+  "misc-safety": [
+    "Fire Call Charges","Fire Fund (अग्नीशमन निधी)",
+    "Marriage Registration (विवाह नोंदणी)","Birth & Death Fees (जन्म व मृत्यु फी)",
+    "General License Fees","Plumber License Fees (Water Supply)",
+    "Advertisement / Hoarding Boards (जाहीराती बोर्ड)"
   ],
-  "misc-transport": [
-    "Vehicle Lifting Charges Royalty",
-    "STAND BY DUTY CHARGES",
-    "RESCUE CALL CHARGES",
-    "सायकल व स्कुटर थांबे (Cycle & Scooter Stand Fees)",
-    "वाहन तपासणी / दंड (Vehicle Inspection / Penalty)"
-  ],
-  "misc-finance": [
-    "अन्य इतर कर व वसुली",
-    "इतर फी व शुल्क वसुली",
-    "इतर वसुली",
-    "इतर व संकिर्ण",
-    "इतर स्थायी अग्रिम वसुली",
-    "इमारत भाडे (Building Rent)",
-    "नाट्यगृह भाडे (Theater Rent)",
-    "जमीन भाडे / टपरी भाडे (Land/Stall Rent)",
-    "दुकान भाडे (Shop Rent)",
-    "झाडे व फुले विक्री (Sale of Trees & Flowers)",
-    "Election Deposit",
-    "Election Form Fee",
-    "Election Voter List Fee and Other",
-    "Excess Payment Recovery",
-    "AUDIT PARA RECOVERY",
-    "GST Grant",
-    "1% CGST",
-    "6% SGST",
-    "9% CGST",
-    "9% SGST",
-    "5% Supervision Charges",
-    "Development Fund",
-    "City Development Fund",
-    "Local Development Fund",
-    "Special Government Grant",
-    "Primary Education Grant",
-    "Dalit Vasti Development Grant",
-    "महिला व बालकल्याण उत्पन्न",
-    "कर्मचारी पगार परत जमा",
-    "सण अग्रिम वसुली",
-    "बाजार अनामत",
-    "विविध दंड व शुल्क"
+  "misc-water": [
+    "Tanker Charges (पाणी विक्री टॅंकर भाडे)","New Water Connection Fees (नवीन नळ जोडणी)",
+    "Fines for Water Wastage","Drainage Connection Fees",
+    "Drainage Advance Payments","Road Construction / Repair Grants (रस्ते बांधणी व दुरुस्ती अनुदान)",
+    "Tender Forms (टेंडर फोर्म)","Ambulance & Vehicle Charges",
+    "Slaughterhouse Fees (कत्तल खाना)","Cattle Pound Fees (कोंडवाडा फी)",
+    "NA Tax","GST (CGST/SGST — 1%, 6%, 9%)"
   ]
 };
 
 function buildMiscSection(key) {
-  var s   = miscServices[key], tot=sum(s.all);
-  var on  = sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
+  var s=miscServices[key], tot=sum(s.all), dem=sum(s.demand), out=dem-tot;
+  var on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
   var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
   var prevTot = prevFYData ? sum(prevFYData.misc[key].all) : Math.round(tot*0.83);
   var pl = activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24";
@@ -602,6 +403,7 @@ function buildMiscSection(key) {
 }
 function buildAllMiscSections(){ Object.keys(miscServices).forEach(buildMiscSection); }
 /* ===== CHART HELPERS ===== */
+var charts = {};
 function buildBarDS(dem, coll, mode) {
   var colors = {
     all:    'rgba(0,188,212,.85)',   // cyan — matches property card
@@ -910,7 +712,7 @@ function createCharts() {
   var miscMonthly = MONTHS.map(function(m,i){
     var t=0; Object.keys(miscServices).forEach(function(k){ t+=miscServices[k].all[i]; }); return t;
   });
-  var miscLabels=[],miscVals=[],miscColors=['#2d1b6e','#c0202e','#0d4f8a','#7a5200','#0a6b3a','#1a7fc4','#5a3db8','#b8860b'];
+  var miscLabels=[],miscVals=[],miscColors=['#c0202e','#1a7fc4','#0d4f8a','#0a6b3a','#7a5200','#2d1b6e'];
   Object.keys(miscServices).forEach(function(k){ miscLabels.push(miscServices[k].label); miscVals.push(sum(miscServices[k].all)); });
 
   charts.overviewZone = new Chart(document.getElementById('overviewZoneChart'),{type:'bar',data:{labels:WARDS,datasets:[
@@ -1001,7 +803,7 @@ function createCharts() {
   ]},options:barOpts('Water — Year-on-Year Monthly (Rs.L)')});
 
   Object.keys(miscServices).forEach(function(key){
-    var s=miscServices[key], tot=sum(s.all), on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
+    var s=miscServices[key], tot=sum(s.all), dem=sum(s.demand), on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
     var prev=getPrevMiscAll(key);
     charts[key] = new Chart(document.getElementById(key+'BarChart'),{type:'bar',data:{labels:MONTHS,datasets:[
       {label:'Online (Rs.L)',  data:s.online, backgroundColor:'rgba(26,127,196,.85)', stack:'a'},
@@ -1018,7 +820,37 @@ function createCharts() {
   /* --- RTS COLLECTIONS --- */
   buildRTSModule();
 
-  /* --- DIGITAL & OUTSTANDING rendered lazily on section open --- */
+  var digProp=propMoM.map(function(v){return Math.round(v*.5);}), digWater=waterMoM.map(function(v){return Math.round(v*.45);});
+  var digMisc=MONTHS.map(function(m,i){var t=0;Object.keys(miscServices).forEach(function(k){t+=miscServices[k].online[i];});return t;});
+
+  // Digital comparison banner — FY 2024-25 actual: Rs.52 Cr digital (property + water)
+  var prevDigital = 5200; // Rs.52 Cr = 5200 L
+  var currDigital = sum(digProp) + sum(digWater) + sum(digMisc);
+  var digGrowth   = Math.round((currDigital - prevDigital) / prevDigital * 100);
+  var bannerEl2   = document.getElementById('digitalCompareBanner');
+  if(bannerEl2) bannerEl2.innerHTML =
+    '<div class="digital-compare-item"><div class="digital-compare-label">FY 2024-25 Digital Collection</div><div class="digital-compare-val">\u20b952 Cr</div><div class="digital-compare-sub">Property + Water (Actual)</div></div>'
+    +'<div class="digital-compare-arrow">\u2192</div>'
+    +'<div class="digital-compare-item"><div class="digital-compare-label">FY 2025-26 Digital Collection</div><div class="digital-compare-val">'+fmt(currDigital)+'</div><div class="digital-compare-sub">Property + Water + Misc</div></div>'
+    +'<div class="digital-compare-growth">'+(digGrowth>=0?'+':'')+digGrowth+'% YoY</div>';
+
+  charts.digital = new Chart(document.getElementById('digitalMonthlyChart'),{type:'line',data:{labels:MONTHS,datasets:[
+    {label:'Property Online',data:digProp,borderColor:'#1a7fc4',backgroundColor:'rgba(26,127,196,.1)',fill:true,tension:.4},
+    {label:'Water Online',data:digWater,borderColor:'#1aaa5c',backgroundColor:'rgba(26,170,92,.1)',fill:true,tension:.4},
+    {label:'Misc Online',data:digMisc,borderColor:'#c98a00',backgroundColor:'rgba(201,138,0,.1)',fill:true,tension:.4}
+  ]},options:lineOpts('Digital Collections — Monthly Trend — '+getCurrFYLabel()+' (Rs. Lakhs)')});
+  charts.digitalMode = new Chart(document.getElementById('digitalModePie'),{type:'doughnut',data:{labels:['Online Portal','UPI/QR','NEFT/RTGS'],datasets:[{data:[Math.round(totalDigital*.45),Math.round(totalDigital*.35),Math.round(totalDigital*.2)],backgroundColor:['#1a7fc4','#5a3db8','#1aaa5c']}]},options:pieOpts('Digital Mode Split (Rs.L)')});
+  var digHeadLabels=['Property','Water'].concat(Object.keys(miscServices).map(function(k){return miscServices[k].label;}));
+  var digHeadVals=[propOnline,waterOnline].concat(Object.keys(miscServices).map(function(k){return sum(miscServices[k].online);}));
+  charts.digitalHead = new Chart(document.getElementById('digitalHeadBar'),{type:'bar',data:{labels:digHeadLabels,datasets:[{label:'Online Collection (Rs.L)',data:digHeadVals,backgroundColor:'rgba(26,127,196,.8)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},title:{display:true,text:'Digital Collection by Revenue Head (Rs.L)'}},scales:{y:{beginAtZero:true}}}});
+  var digCurr=digProp.map(function(v,i){return v+digWater[i]+digMisc[i];}), digPrev=digCurr.map(function(v){return Math.round(v*.8);});
+  charts.digitalYoY = new Chart(document.getElementById('digitalYoY'),{type:'bar',data:{labels:MONTHS,datasets:[
+    {label:getPrevFYLabel(),data:digPrev,backgroundColor:'rgba(180,190,200,.6)'},
+    {label:getCurrFYLabel(),data:digCurr,backgroundColor:'rgba(26,127,196,.8)'}
+  ]},options:barOpts('Digital Collections — Year-on-Year (Rs.L)')});
+
+  /* --- OUTSTANDING --- */
+  // buildOutstandingCharts(); // canvases commented out — skip
 }
 
 /* ===== OUTSTANDING SECTION ===== */
@@ -1128,193 +960,6 @@ function buildOutstandingCharts() {
   }
 }
 
-/* ===== LAZY RENDER: DIGITAL ===== */
-function renderDigital() {
-  // Guard: check required data is available
-  if(!propMoM || !waterMoM || !miscServices) { console.error('renderDigital: data not ready'); return; }
-
-  var digProp  = propMoM.map(function(v){ return Math.round(v * .5); });
-  var digWater = waterMoM.map(function(v){ return Math.round(v * .45); });
-  var digMisc  = MONTHS.map(function(m, i){
-    var t = 0; Object.keys(miscServices).forEach(function(k){ t += miscServices[k].online[i]; }); return t;
-  });
-  var prevDigital = 5200;
-  var currDigital = sum(digProp) + sum(digWater) + sum(digMisc);
-  var digGrowth   = Math.round((currDigital - prevDigital) / prevDigital * 100);
-  var bannerEl    = document.getElementById('digitalCompareBanner');
-  if(bannerEl) bannerEl.innerHTML =
-    '<div class="digital-compare-item"><div class="digital-compare-label">FY 2024-25 Digital Collection</div><div class="digital-compare-val">\u20b952 Cr</div><div class="digital-compare-sub">Property + Water (Actual)</div></div>'
-    + '<div class="digital-compare-arrow">\u2192</div>'
-    + '<div class="digital-compare-item"><div class="digital-compare-label">FY '+activeFY+' Digital Collection</div><div class="digital-compare-val">'+fmt(currDigital)+'</div><div class="digital-compare-sub">Property + Water + Misc</div></div>'
-    + '<div class="digital-compare-growth">'+(digGrowth >= 0 ? '+' : '')+digGrowth+'% YoY</div>';
-
-  // Monthly trend chart
-  if(charts.digital) { charts.digital.destroy(); charts.digital = null; }
-  charts.digital = new Chart(document.getElementById('digitalMonthlyChart'), {
-    type: 'line',
-    data: { labels: MONTHS, datasets: [
-      {label:'Property Online', data:digProp,  borderColor:'#1a7fc4', backgroundColor:'rgba(26,127,196,.1)', fill:true, tension:.4},
-      {label:'Water Online',    data:digWater, borderColor:'#1aaa5c', backgroundColor:'rgba(26,170,92,.1)',  fill:true, tension:.4},
-      {label:'Misc Online',     data:digMisc,  borderColor:'#c98a00', backgroundColor:'rgba(201,138,0,.1)',  fill:true, tension:.4}
-    ]},
-    options: lineOpts('Digital Collections — Monthly Trend — FY '+activeFY+' (Rs. Lakhs)')
-  });
-
-  // Mode pie
-  if(charts.digitalMode) { charts.digitalMode.destroy(); charts.digitalMode = null; }
-  charts.digitalMode = new Chart(document.getElementById('digitalModePie'), {
-    type: 'doughnut',
-    data: { labels: ['Online Portal','UPI/QR','NEFT/RTGS'], datasets: [{
-      data: [Math.round(totalDigital*.45), Math.round(totalDigital*.35), Math.round(totalDigital*.2)],
-      backgroundColor: ['#1a7fc4','#5a3db8','#1aaa5c']
-    }]},
-    options: pieOpts('Digital Mode Split (Rs.L)')
-  });
-
-  // Head bar
-  var digHeadLabels = ['Property','Water'].concat(Object.keys(miscServices).map(function(k){ return miscServices[k].label; }));
-  var digHeadVals   = [propOnline, waterOnline].concat(Object.keys(miscServices).map(function(k){ return sum(miscServices[k].online); }));
-  if(charts.digitalHead) { charts.digitalHead.destroy(); charts.digitalHead = null; }
-  charts.digitalHead = new Chart(document.getElementById('digitalHeadBar'), {
-    type: 'bar',
-    data: { labels: digHeadLabels, datasets: [{
-      label: 'Online Collection (Rs.L)', data: digHeadVals, backgroundColor: 'rgba(26,127,196,.8)'
-    }]},
-    options: { responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'top'}, title:{display:true, text:'Digital Collection by Revenue Head (Rs.L)'} },
-      scales:{ y:{beginAtZero:true} }
-    }
-  });
-
-  // YoY
-  var digCurr = digProp.map(function(v, i){ return v + digWater[i] + digMisc[i]; });
-  var digPrev = digCurr.map(function(v){ return Math.round(v * .8); });
-  if(charts.digitalYoY) { charts.digitalYoY.destroy(); charts.digitalYoY = null; }
-  charts.digitalYoY = new Chart(document.getElementById('digitalYoY'), {
-    type: 'bar',
-    data: { labels: MONTHS, datasets: [
-      {label: getPrevFYLabel(), data: digPrev, backgroundColor:'rgba(180,190,200,.6)'},
-      {label: getCurrFYLabel(), data: digCurr, backgroundColor:'rgba(26,127,196,.8)'}
-    ]},
-    options: barOpts('Digital Collections — Year-on-Year (Rs.L)')
-  });
-}
-
-/* ===== LAZY RENDER: OUTSTANDING ===== */
-function renderOutstanding() {
-  if(!propDemand || !propColl || !waterDemand || !waterColl) { 
-    console.error('renderOutstanding: data not ready', {propDemand, propColl, waterDemand, waterColl}); 
-    // Show error message to user instead of white screen
-    var bannerEl = document.getElementById('outBanner');
-    if(bannerEl) {
-      bannerEl.innerHTML = '<div style="padding:20px;text-align:center;color:#c0202e;background:#fde8e8;border-radius:10px;margin:20px 0;">'
-        + '<h3>⚠️ Data Not Available</h3>'
-        + '<p>Outstanding data is being loaded. Please refresh the page or try again.</p>'
-        + '<button class="btn-primary" onclick="location.reload()">Refresh Page</button>'
-        + '</div>';
-    }
-    return; 
-  }
-  
-  var propDemTotal  = sum(propDemand);
-  var waterDemTotal = sum(waterDemand);
-  var grandDemOut   = propDemTotal + waterDemTotal;
-
-  // Zone-level outstanding using actual collection arrays
-  var propOut  = propDemand.map(function(v, i){ return Math.max(0, v - propColl.all[i]); });
-  var waterOut = waterDemand.map(function(v, i){ return Math.max(0, v - waterColl.all[i]); });
-  var totalOut = WARDS.map(function(w, i){ return Math.round((propOut[i] + waterOut[i]) * 10) / 10; });
-
-  var propOutTotal  = sum(propOut);
-  var waterOutTotal = sum(waterOut);
-  var totalOutVal   = propOutTotal + waterOutTotal;
-  var collectedSoFar = propTotal + waterTotal;
-  var collEff = WARDS.map(function(w, i){
-    var dem = propDemand[i] + waterDemand[i];
-    var col = propColl.all[i] + waterColl.all[i];
-    return dem > 0 ? Math.round(col / dem * 100) : 0;
-  });
-
-  // Top banner
-  var bannerEl = document.getElementById('outBanner');
-  if(bannerEl) bannerEl.innerHTML = [
-    {label:'Total Outstanding',    val:fmtFull(totalOutVal),   sub:fmt(totalOutVal)+' of '+fmt(grandDemOut)+' demand', cls:'red'},
-    {label:'Property Outstanding', val:fmtFull(propOutTotal),  sub:fmt(propOutTotal),                                  cls:'amber'},
-    {label:'Water Outstanding',    val:fmtFull(waterOutTotal), sub:fmt(waterOutTotal),                                 cls:'amber'},
-    {label:'Collected So Far',     val:fmtFull(collectedSoFar),sub:fmt(collectedSoFar)+' collected',                   cls:'green'},
-    {label:'Collection Efficiency',val:pct(collectedSoFar, grandDemOut)+'%', sub:'Property + Water',                   cls:'blue'},
-    {label:'Recovery Potential',   val:fmtFull(totalOutVal),   sub:'Remaining FY',                                     cls:'blue'}
-  ].map(function(s){
-    return '<div class="out-banner-stat"><div class="out-banner-label">'+s.label+'</div>'
-      + '<div class="out-banner-value '+s.cls+'">'+s.val+'</div>'
-      + '<div class="out-banner-sub">'+s.sub+'</div></div>';
-  }).join('');
-
-  // Zone priority cards
-  var ranked = WARDS.map(function(w, i){
-    return {zone:w, propOut:propOut[i], waterOut:waterOut[i], total:totalOut[i], eff:collEff[i]};
-  }).sort(function(a, b){ return b.total - a.total; });
-
-  var gridEl = document.getElementById('outZoneGrid');
-  if(gridEl) gridEl.innerHTML = ranked.map(function(r, i){
-    var pClass   = i===0?'priority-1':i<=2?'priority-2':i<=4?'priority-3':'priority-low';
-    var rClass   = i===0?'r1':i<=2?'r2':i<=4?'r3':'rlow';
-    var effColor = r.eff>=50?'#1aaa5c':r.eff>=25?'#c98a00':'#c0202e';
-    var focus    = i===0?' \uD83C\uDFAF':i<=2?' \u26A0\uFE0F':'';
-    return '<div class="out-zone-card '+pClass+'">'
-      + '<div class="out-zone-card-rank '+rClass+'">'+(i+1)+'</div>'
-      + '<div class="out-zone-name">'+r.zone+focus+'</div>'
-      + '<div class="out-zone-amount">'+fmtFull(r.total)+'</div>'
-      + '<div class="out-zone-sub">'+fmt(r.total)+' outstanding</div>'
-      + '<div class="out-zone-sub">Prop: '+fmt(r.propOut)+' | Water: '+fmt(r.waterOut)+'</div>'
-      + '<div class="out-zone-eff" style="color:'+effColor+'">'+r.eff+'% efficiency</div>'
-      + '</div>';
-  }).join('');
-
-  // Zone ranked bar chart
-  var rankedLabels = ranked.map(function(r){ return r.zone; });
-  var rankedProp   = ranked.map(function(r){ return r.propOut; });
-  var rankedWater  = ranked.map(function(r){ return r.waterOut; });
-  if(charts.outZone) { charts.outZone.destroy(); charts.outZone = null; }
-  charts.outZone = new Chart(document.getElementById('outZoneRanked'), {
-    type: 'bar',
-    data: { labels: rankedLabels, datasets: [
-      {label:'Property Outstanding (Rs.L)', data:rankedProp,  backgroundColor:'rgba(192,32,46,.75)'},
-      {label:'Water Outstanding (Rs.L)',    data:rankedWater, backgroundColor:'rgba(201,138,0,.85)'}
-    ]},
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{position:'top'}, title:{display:true, text:'Outstanding by Zone — Ranked (Property + Water) — FY '+activeFY, font:{size:13}} },
-      scales:{ x:{stacked:true}, y:{beginAtZero:true, stacked:true, title:{display:true, text:'Rs. Lakhs'}} }
-    }
-  });
-
-  // Outstanding pie
-  if(charts.outPie) { charts.outPie.destroy(); charts.outPie = null; }
-  charts.outPie = new Chart(document.getElementById('outPie'), {
-    type: 'doughnut',
-    data: { labels: ['Property Outstanding','Water Outstanding','Collected'], datasets: [{
-      data: [propOutTotal, waterOutTotal, collectedSoFar],
-      backgroundColor: ['#c0202e','#c98a00','#1aaa5c']
-    }]},
-    options: pieOpts('Outstanding vs Collected Split (Rs.L) — FY '+activeFY)
-  });
-
-  // Efficiency bar
-  var effColors = collEff.map(function(e){ return e>=50?'rgba(26,170,92,.85)':e>=25?'rgba(201,138,0,.85)':'rgba(192,32,46,.85)'; });
-  if(charts.outEff) { charts.outEff.destroy(); charts.outEff = null; }
-  charts.outEff = new Chart(document.getElementById('outEffChart'), {
-    type: 'bar',
-    data: { labels: WARDS, datasets: [{
-      label: 'Collection Efficiency %', data: collEff, backgroundColor: effColors, borderRadius: 5
-    }]},
-    options: { responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, title:{display:true, text:'Collection Efficiency % per Zone — FY '+activeFY, font:{size:12}} },
-      scales:{ y:{min:0, max:100, title:{display:true, text:'%'}} }
-    }
-  });
-}
-
 /* ===== SWITCH FY ===== */
 function switchFY(fy, btn) {
   if(fy === activeFY) return;
@@ -1328,16 +973,7 @@ function switchFY(fy, btn) {
   Object.keys(charts).forEach(function(k){ if(charts[k]) charts[k].destroy(); });
   charts = {};
   createCharts();
-  buildReports();
   displayTable();
-  // Re-render lazy sections if currently visible
-  var activeSection = document.querySelector('.section.active');
-  if(activeSection) {
-    var sid = activeSection.id;
-    if(sid === 'digital')     renderDigital();
-    if(sid === 'outstanding') renderOutstanding();
-    if(sid === 'reports')     { renderZoneCount(); renderUsageWise(); renderDaywise(); }
-  }
 }
 
 /* ===== INITIAL RENDER ===== */
@@ -1346,6 +982,8 @@ buildAllMiscSections();
 updateKPIs("2025-26");
 refreshStatStrips("2025-26");
 createCharts();
+buildReports();
+displayTable();
 
 /* ===== PROPERTY TABLE ===== */
 
@@ -1454,16 +1092,12 @@ otherZones.forEach(function(zone){
 
 var currentPage = 1, rowsPerPage = 10;
 
-/* tableData is now fully populated — safe to render */
-displayTable();
-buildReports();
-
 function displayTable(fromDate, toDate) {
   var tbody = document.querySelector('#dataTable tbody');
   if(!tbody) return;
   tbody.innerHTML = '';
 
-  var filtered = (tableData || []).filter(function(d){
+  var filtered = tableData.filter(function(d){
     var dateOk   = (!fromDate || !toDate) || (d.date >= fromDate && d.date <= toDate);
     var zoneEl   = document.getElementById('tblZoneFilter');
     var modeEl   = document.getElementById('tblModeFilter');
@@ -1738,16 +1372,16 @@ var DAYWISE_DATA = [];
   DAYWISE_DATA.sort(function(a,b){ return a._dt - b._dt; });
 })();
 
-/* All report data is now ready — build reports */
-
 /* ===== REPORT FUNCTIONS ===== */
-
 function showReport(id, btn) {
   document.querySelectorAll('.report-panel').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.report-tab').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
 }
+
+var rptPages = { 'rpt-zone-count':1, 'rpt-usage-wise':1, 'rpt-daywise':1 };
+var RPT_ROWS = 10;
 
 function buildReports() {
   renderZoneCount();
@@ -1778,7 +1412,7 @@ function renderZoneCount(search) {
 }
 
 function renderUsageWise(search) {
-  var data = (USAGE_WISE_DATA || []).filter(function(r){
+  var data = USAGE_WISE_DATA.filter(function(r){
     if(!search) return true;
     var s = search.toLowerCase();
     return r.ward.toLowerCase().indexOf(s)>-1 || r.usage.toLowerCase().indexOf(s)>-1;
@@ -1786,17 +1420,16 @@ function renderUsageWise(search) {
   var page = rptPages['rpt-usage-wise'];
   var start = (page-1)*RPT_ROWS;
   var tbody = document.getElementById('rptUsageBody');
-  if(!tbody) return;
   tbody.innerHTML = data.slice(start, start+RPT_ROWS).map(function(r){
     return '<tr><td>'+r.ward+'</td><td>'+r.usage+'</td><td>'+r.date+'</td>'
       +'<td>'+r.count+'</td><td>\u20b9'+r.collection.toLocaleString('en-IN')+'</td></tr>';
   }).join('');
-  var footer = document.getElementById('rptUsageFooter');
-  if(footer) footer.textContent = 'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
+  document.getElementById('rptUsageFooter').textContent =
+    'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
 }
 
 function renderDaywise(search) {
-  var data = (DAYWISE_DATA || []).filter(function(r){
+  var data = DAYWISE_DATA.filter(function(r){
     if(!search) return true;
     var s = search.toLowerCase();
     return r.date.toLowerCase().indexOf(s)>-1 || r.mode.toLowerCase().indexOf(s)>-1;
@@ -1804,14 +1437,13 @@ function renderDaywise(search) {
   var page = rptPages['rpt-daywise'];
   var start = (page-1)*RPT_ROWS;
   var tbody = document.getElementById('rptDayBody');
-  if(!tbody) return;
   tbody.innerHTML = data.slice(start, start+RPT_ROWS).map(function(r){
     return '<tr><td>'+r.date+'</td>'
       +'<td>\u20b9'+r.amount.toLocaleString('en-IN')+'</td>'
       +'<td>'+r.mode+'</td></tr>';
   }).join('');
-  var footer = document.getElementById('rptDayFooter');
-  if(footer) footer.textContent = 'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
+  document.getElementById('rptDayFooter').textContent =
+    'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
 }
 
 function filterReport(panel) {
@@ -1862,22 +1494,4 @@ function printReport(panelId) {
     +'</head><body>'+content+'</body></html>');
   win.document.close();
   win.print();
-}
-
-
-
-
-function showErrorMessage(sectionId) {
-  var el = document.getElementById(sectionId);
-  if(el) {
-    // Clear any existing content and show error
-    el.innerHTML = `
-      <div style="padding: 40px 20px; text-align: center; background: #fff5f5; border: 2px solid #ff6b6b; border-radius: 12px; margin: 20px;">
-        <div style="font-size: 24px; color: #c0202e; margin-bottom: 12px;">⚠️ Loading Error</div>
-        <div style="font-size: 16px; color: #a71d2a; margin-bottom: 8px;">Section "${sectionId}" failed to load</div>
-        <div style="font-size: 14px; color: #666; margin-bottom: 20px;">Check console for details. Refresh page or contact admin.</div>
-        <button onclick="location.reload()" style="background: #1a3a5c; color: white; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Reload Page</button>
-      </div>
-    `;
-  }
 }
