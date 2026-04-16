@@ -7,6 +7,14 @@
   <title>CSMC Revenue Dashboard</title>
   <link rel="stylesheet" href="style.css?v=4">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    window.onerror = function(msg, src, line, col, err) {
+      var div = document.getElementById('_jsErrorBanner');
+      if(!div) { div = document.createElement('div'); div.id='_jsErrorBanner'; div.style='position:fixed;bottom:0;left:0;right:0;background:#c0202e;color:#fff;padding:10px 16px;font-size:13px;z-index:9999;font-family:monospace;'; document.body.appendChild(div); }
+      div.textContent = '⚠ JS Error: ' + msg + ' (line ' + line + ')';
+      return false;
+    };
+  </script>
 </head>
 <body>
 

@@ -12,14 +12,14 @@ function showSection(id, label) {
     var main = document.querySelector('.main');
     if(main) main.scrollTop = 0;
     // Safe lazy render with error isolation
-    if(id === 'digital'     && typeof renderDigital     === 'function') { try { renderDigital();     } catch(e){ console.error('renderDigital error:', e); } }
-    if(id === 'outstanding' && typeof renderOutstanding === 'function') { try { renderOutstanding(); } catch(e){ console.error('renderOutstanding error:', e); } }
+    if(id === 'digital'     && typeof renderDigital     === 'function') { try { renderDigital();     } catch(e){ console.error('renderDigital error:', e); showErrorMessage('digital'); } }
+    if(id === 'outstanding' && typeof renderOutstanding === 'function') { try { renderOutstanding(); } catch(e){ console.error('renderOutstanding error:', e); showErrorMessage('outstanding'); } }
     if(id === 'reports') {
       try { renderZoneCount();  } catch(e){ console.error('renderZoneCount error:', e); }
       try { renderUsageWise();  } catch(e){ console.error('renderUsageWise error:', e); }
       try { renderDaywise();    } catch(e){ console.error('renderDaywise error:', e); }
     }
-    if(id === 'rts' && typeof buildRTSModule === 'function') { try { buildRTSModule(); } catch(e){ console.error('buildRTSModule error:', e); } }
+    if(id === 'rts' && typeof buildRTSModule === 'function') { try { buildRTSModule(); } catch(e){ console.error('buildRTSModule error:', e); showErrorMessage('rts'); } }
     // Resize charts after section is visible
     setTimeout(function(){
       if(typeof charts !== 'undefined') {
@@ -1169,7 +1169,20 @@ function renderDigital() {
 
 /* ===== LAZY RENDER: OUTSTANDING ===== */
 function renderOutstanding() {
-  if(!propDemand || !propColl || !waterDemand || !waterColl) { console.error('renderOutstanding: data not ready'); return; }
+  if(!propDemand || !propColl || !waterDemand || !waterColl) { 
+    console.error('renderOutstanding: data not ready', {propDemand, propColl, waterDemand, waterColl}); 
+    // Show error message to user instead of white screen
+    var bannerEl = document.getElementById('outBanner');
+    if(bannerEl) {
+      bannerEl.innerHTML = '<div style="padding:20px;text-align:center;color:#c0202e;background:#fde8e8;border-radius:10px;margin:20px 0;">'
+        + '<h3>⚠️ Data Not Available</h3>'
+        + '<p>Outstanding data is being loaded. Please refresh the page or try again.</p>'
+        + '<button class="btn-primary" onclick="location.reload()">Refresh Page</button>'
+        + '</div>';
+    }
+    return; 
+  }
+  
   var propDemTotal  = sum(propDemand);
   var waterDemTotal = sum(waterDemand);
   var grandDemOut   = propDemTotal + waterDemTotal;
@@ -1233,10 +1246,14 @@ function renderOutstanding() {
   charts.outZone = new Chart(document.getElementById('outZoneRanked'), {
     type: 'bar',
     data: { labels: rankedLabels, datasets: [
-      {label:'Property Outstanding (Rs.L)', data:rankedProp,  backgroundColor:'rgba(192,32,46,.75)', stack:'a'},
-      {label:'Water Outstanding (Rs.L)',    data:rankedWater, backgroundColor:'rgba(201,138,0,.85)', stack:'a'}
+      {label:'Property Outstanding (Rs.L)', data:rankedProp,  backgroundColor:'rgba(192,32,46,.75)'},
+      {label:'Water Outstanding (Rs.L)',    data:rankedWater, backgroundColor:'rgba(201,138,0,.85)'}
     ]},
-    options: barOpts('Outstanding by Zone — Ranked (Property + Water) — FY '+activeFY)
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top'}, title:{display:true, text:'Outstanding by Zone — Ranked (Property + Water) — FY '+activeFY, font:{size:13}} },
+      scales:{ x:{stacked:true}, y:{beginAtZero:true, stacked:true, title:{display:true, text:'Rs. Lakhs'}} }
+    }
   });
 
   // Outstanding pie
@@ -1296,7 +1313,6 @@ buildAllMiscSections();
 updateKPIs("2025-26");
 refreshStatStrips("2025-26");
 createCharts();
-buildReports();
 
 /* ===== PROPERTY TABLE ===== */
 
@@ -1407,6 +1423,7 @@ var currentPage = 1, rowsPerPage = 10;
 
 /* tableData is now fully populated — safe to render */
 displayTable();
+buildReports();
 
 function displayTable(fromDate, toDate) {
   var tbody = document.querySelector('#dataTable tbody');
@@ -1736,12 +1753,13 @@ function renderUsageWise(search) {
   var page = rptPages['rpt-usage-wise'];
   var start = (page-1)*RPT_ROWS;
   var tbody = document.getElementById('rptUsageBody');
+  if(!tbody) return;
   tbody.innerHTML = data.slice(start, start+RPT_ROWS).map(function(r){
     return '<tr><td>'+r.ward+'</td><td>'+r.usage+'</td><td>'+r.date+'</td>'
       +'<td>'+r.count+'</td><td>\u20b9'+r.collection.toLocaleString('en-IN')+'</td></tr>';
   }).join('');
-  document.getElementById('rptUsageFooter').textContent =
-    'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
+  var footer = document.getElementById('rptUsageFooter');
+  if(footer) footer.textContent = 'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
 }
 
 function renderDaywise(search) {
@@ -1753,13 +1771,14 @@ function renderDaywise(search) {
   var page = rptPages['rpt-daywise'];
   var start = (page-1)*RPT_ROWS;
   var tbody = document.getElementById('rptDayBody');
+  if(!tbody) return;
   tbody.innerHTML = data.slice(start, start+RPT_ROWS).map(function(r){
     return '<tr><td>'+r.date+'</td>'
       +'<td>\u20b9'+r.amount.toLocaleString('en-IN')+'</td>'
       +'<td>'+r.mode+'</td></tr>';
   }).join('');
-  document.getElementById('rptDayFooter').textContent =
-    'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
+  var footer = document.getElementById('rptDayFooter');
+  if(footer) footer.textContent = 'Showing '+(start+1)+' to '+Math.min(start+RPT_ROWS,data.length)+' of '+data.length+' entries';
 }
 
 function filterReport(panel) {
@@ -1815,3 +1834,21 @@ function printReport(panelId) {
 
 
 
+
+/* Helper function to show error messages in sections */
+function showErrorMessage(sectionId) {
+  var messages = {
+    'outstanding': 'Unable to load Outstanding data. Please refresh the page.',
+    'digital': 'Unable to load Digital Collections data. Please refresh the page.',
+    'rts': 'Unable to load RTS Collections data. Please refresh the page.'
+  };
+  var bannerId = sectionId === 'outstanding' ? 'outBanner' : sectionId === 'digital' ? 'digitalCompareBanner' : 'rtsStatStrip';
+  var bannerEl = document.getElementById(bannerId);
+  if(bannerEl) {
+    bannerEl.innerHTML = '<div style="padding:20px;text-align:center;color:#c0202e;background:#fde8e8;border-radius:10px;margin:20px 0;">'
+      + '<h3> Error Loading Data</h3>'
+      + '<p>' + (messages[sectionId] || 'An error occurred while loading this section.') + '</p>'
+      + '<button class="btn-primary" onclick="location.reload()">Refresh Page</button>'
+      + '</div>';
+  }
+}
