@@ -1068,10 +1068,9 @@ function buildOutstandingCharts() {
     var pClass   = i===0?'priority-1':i<=2?'priority-2':i<=4?'priority-3':'priority-low';
     var rClass   = i===0?'r1':i<=2?'r2':i<=4?'r3':'rlow';
     var effColor = r.eff>=15?'#1aaa5c':r.eff>=8?'#c98a00':'#c0202e';
-    var focus    = i===0?' \uD83C\uDFAF':i<=2?' \u26A0\uFE0F':'';
     return '<div class="out-zone-card '+pClass+'">'
       +'<div class="out-zone-card-rank '+rClass+'">'+(i+1)+'</div>'
-      +'<div class="out-zone-name">'+r.zone+focus+'</div>'
+      +'<div class="out-zone-name">'+r.zone+'</div>'
       +'<div class="out-zone-amount">'+fmtFull(r.total)+'</div>'
       +'<div class="out-zone-sub">'+fmt(r.total)+' outstanding</div>'
       +'<div class="out-zone-sub">Prop: '+fmt(r.propOut)+' | Water: '+fmt(r.waterOut)+'</div>'
@@ -1260,10 +1259,9 @@ function renderOutstanding() {
     var pClass   = i===0?'priority-1':i<=2?'priority-2':i<=4?'priority-3':'priority-low';
     var rClass   = i===0?'r1':i<=2?'r2':i<=4?'r3':'rlow';
     var effColor = r.eff>=50?'#1aaa5c':r.eff>=25?'#c98a00':'#c0202e';
-    var focus    = i===0?' \uD83C\uDFAF':i<=2?' \u26A0\uFE0F':'';
     return '<div class="out-zone-card '+pClass+'">'
       + '<div class="out-zone-card-rank '+rClass+'">'+(i+1)+'</div>'
-      + '<div class="out-zone-name">'+r.zone+focus+'</div>'
+      + '<div class="out-zone-name">'+r.zone+'</div>'
       + '<div class="out-zone-amount">'+fmtFull(r.total)+'</div>'
       + '<div class="out-zone-sub">'+fmt(r.total)+' outstanding</div>'
       + '<div class="out-zone-sub">Prop: '+fmt(r.propOut)+' | Water: '+fmt(r.waterOut)+'</div>'
