@@ -510,8 +510,8 @@ var MISC_SUB_SERVICES = {
 };
 
 function buildMiscSection(key) {
-  var s=miscServices[key], tot=sum(s.all), dem=sum(s.demand), out=dem-tot;
-  var on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
+  var s   = miscServices[key], tot=sum(s.all);
+  var on  = sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
   var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
   var prevTot = prevFYData ? sum(prevFYData.misc[key].all) : Math.round(tot*0.83);
   var pl = activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24";
@@ -966,7 +966,7 @@ function createCharts() {
   ]},options:barOpts('Water — Year-on-Year Monthly (Rs.L)')});
 
   Object.keys(miscServices).forEach(function(key){
-    var s=miscServices[key], tot=sum(s.all), dem=sum(s.demand), on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
+    var s=miscServices[key], tot=sum(s.all), on=sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
     var prev=getPrevMiscAll(key);
     charts[key] = new Chart(document.getElementById(key+'BarChart'),{type:'bar',data:{labels:MONTHS,datasets:[
       {label:'Online (Rs.L)',  data:s.online, backgroundColor:'rgba(26,127,196,.85)', stack:'a'},
