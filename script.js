@@ -1276,6 +1276,7 @@ function switchFY(fy, btn) {
   Object.keys(charts).forEach(function(k){ if(charts[k]) charts[k].destroy(); });
   charts = {};
   createCharts();
+  buildReports();
   displayTable();
   // Re-render lazy sections if currently visible
   var activeSection = document.querySelector('.section.active');
@@ -1293,6 +1294,7 @@ buildAllMiscSections();
 updateKPIs("2025-26");
 refreshStatStrips("2025-26");
 createCharts();
+buildReports();
 
 /* ===== PROPERTY TABLE ===== */
 
@@ -1774,9 +1776,6 @@ function filterReport(panel) {
 }
 
 /* Export CSV */
-/* buildReports() called here — after all render functions are defined */
-buildReports();
-
 function exportTableCSV(tableId, filename) {
   var rows = document.querySelectorAll('#'+tableId+' tr');
   var csv  = Array.from(rows).map(function(r){
