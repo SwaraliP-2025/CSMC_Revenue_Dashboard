@@ -1,5 +1,7 @@
 ﻿/* ===== GLOBAL CHARTS OBJECT — must be at top ===== */
 var charts = {};
+var rptPages = { 'rpt-zone-count':1, 'rpt-usage-wise':1, 'rpt-daywise':1 };
+var RPT_ROWS = 10;
 
 /* ===== NAVIGATION ===== */
 function showSection(id, label) {
@@ -1689,8 +1691,6 @@ var DAYWISE_DATA = [];
 /* All report data is now ready — build reports */
 
 /* ===== REPORT FUNCTIONS ===== */
-var rptPages = { 'rpt-zone-count':1, 'rpt-usage-wise':1, 'rpt-daywise':1 };
-var RPT_ROWS = 10;
 
 function showReport(id, btn) {
   document.querySelectorAll('.report-panel').forEach(function(p){ p.classList.remove('active'); });
