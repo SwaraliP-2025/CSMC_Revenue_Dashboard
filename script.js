@@ -1555,7 +1555,8 @@ function goPage(p){ currentPage = p; displayTable(); }
 
 /* FY month index → actual Date */
 function monthIndexToDate(i) {
-  var base = activeFY === "2024-25" ? new Date("2024-04-01") : new Date("2025-04-01");
+  // Use local date constructor to avoid UTC timezone shift issues
+  var base = activeFY === "2024-25" ? new Date(2024, 3, 1) : new Date(2025, 3, 1); // month 3 = April
   base.setMonth(base.getMonth() + i);
   return base;
 }
@@ -1569,25 +1570,74 @@ function applyFilters() {
   var to   = new Date(toVal); to.setHours(23,59,59);
   if(from > to) { alert("From date must be before To date."); return; }
 
-  // Find months overlapping the date range
   var idx = getMonthsInRange(from, to);
+  if(idx.length === 0) { alert("No data found in selected date range."); return; }
+  var fl = idx.map(function(i){ return MONTHS[i]; });
 
-  if(idx.length > 0) {
-    var fl = idx.map(function(i){ return MONTHS[i]; });
-    // Update property demand vs collection bar chart
-    if(charts.property) {
-      charts.property.data.labels = fl;
-      charts.property.data.datasets[0].data = idx.map(function(i){ return Math.round(propDemand[i % propDemand.length] * (idx.length/12)); });
-      charts.property.data.datasets[1].data = idx.map(function(i){ return Math.round(propColl.all[i % propColl.all.length] * (idx.length/12)); });
-      charts.property.update();
-    }
-    // Update MoM chart
-    if(charts.propMoM) {
-      charts.propMoM.data.labels = fl;
-      charts.propMoM.data.datasets[0].data = idx.map(function(i){ return propMoM[i]; });
-      if(charts.propMoM.data.datasets[1]) charts.propMoM.data.datasets[1].data = idx.map(function(i){ return propMoM_prev[i]; });
-      charts.propMoM.update();
-    }
+  // propMoM is 12-month collection; propDemand is zone-wise (10 zones) — use propMoM for monthly totals
+  // Estimate monthly demand proportionally from annual demand total
+  var annualDemand = sum(propDemand);
+  var fMoM     = idx.map(function(i){ return propMoM[i]      || 0; });
+  var fMoMPrev = idx.map(function(i){ return propMoM_prev[i] || 0; });
+  // Monthly demand = annual demand / 12 (uniform spread)
+  var monthlyDemand = Math.round(annualDemand / 12);
+  var fDemand  = idx.map(function(){ return monthlyDemand; });
+
+  // Monthly mode split — scale from zone totals proportionally
+  var totalOnline = sum(propColl.online);
+  var totalCash   = sum(propColl.cash);
+  var totalCheque = sum(propColl.cheque);
+  var totalColl   = sum(propColl.all);
+  var onlineRatio = totalColl ? totalOnline / totalColl : 0.33;
+  var cashRatio   = totalColl ? totalCash   / totalColl : 0.33;
+  var chequeRatio = totalColl ? totalCheque / totalColl : 0.34;
+
+  var fCollTotal   = sum(fMoM);
+  var fOnlineTotal = Math.round(fCollTotal * onlineRatio);
+  var fCashTotal   = Math.round(fCollTotal * cashRatio);
+  var fChequeTotal = Math.round(fCollTotal * chequeRatio);
+  var fDemTotal    = sum(fDemand);
+  var fOutstanding = Math.max(0, fDemTotal - fCollTotal);
+
+  // --- Update stat strip ---
+  makeStatStrip("propStatStrip",[
+    {label:"Total Demand",  value:fmtFull(fDemTotal),    sub:fmt(fDemTotal)+' (filtered)'},
+    {label:"Collected",     value:fmtFull(fCollTotal),   sub:fmt(fCollTotal)},
+    {label:"Outstanding",   value:fmtFull(fOutstanding), sub:fmt(fOutstanding)},
+    {label:"Efficiency",    value:pct(fCollTotal,fDemTotal)+"%"},
+    {label:"Online",        value:fmtFull(fOnlineTotal), sub:pct(fOnlineTotal,fCollTotal)+"% of coll."},
+    {label:"Cash",          value:fmtFull(fCashTotal)},
+    {label:"Cheque",        value:fmtFull(fChequeTotal)},
+    {label:"Period",        value:fl[0]+(fl.length>1?' – '+fl[fl.length-1]:'')}
+  ]);
+
+  // --- Update charts ---
+  if(charts.property) {
+    charts.property.data.labels = fl;
+    charts.property.data.datasets[0].data = fDemand;
+    charts.property.data.datasets[1].data = fMoM;
+    charts.property.update();
+  }
+  if(charts.propPie) {
+    charts.propPie.data.datasets[0].data = [fOnlineTotal, fCashTotal, fChequeTotal, fOutstanding];
+    charts.propPie.update();
+  }
+  if(charts.propOut) {
+    charts.propOut.data.labels = fl;
+    charts.propOut.data.datasets[0].data = fDemand.map(function(v,i){ return Math.max(0, v - fMoM[i]); });
+    charts.propOut.update();
+  }
+  if(charts.propMoM) {
+    charts.propMoM.data.labels = fl;
+    charts.propMoM.data.datasets[0].data = fMoM;
+    if(charts.propMoM.data.datasets[1]) charts.propMoM.data.datasets[1].data = fMoMPrev;
+    charts.propMoM.update();
+  }
+  if(charts.propYoY) {
+    charts.propYoY.data.labels = fl;
+    charts.propYoY.data.datasets[0].data = fMoMPrev;
+    charts.propYoY.data.datasets[1].data = fMoM;
+    charts.propYoY.update();
   }
 
   displayTable(from, to);
@@ -1596,11 +1646,24 @@ function applyFilters() {
 function clearFilters() {
   document.getElementById('fromDate').value = '';
   document.getElementById('toDate').value   = '';
-  // Restore full year on all property charts
+
+  // Restore full-year stat strip
+  refreshStatStrips(activeFY);
+
+  // Restore all property charts to full FY
   if(charts.property) {
     charts.property.data.labels = WARDS;
     charts.property.data.datasets = buildBarDS(propDemand, propColl.all, 'all');
     charts.property.update();
+  }
+  if(charts.propPie) {
+    charts.propPie.data.datasets[0].data = [propOnline, sum(propColl.cash), sum(propColl.cheque), Math.max(0,propOutstanding)];
+    charts.propPie.update();
+  }
+  if(charts.propOut) {
+    charts.propOut.data.labels = WARDS;
+    charts.propOut.data.datasets[0].data = propDemand.map(function(v,i){ return v - propColl.all[i]; });
+    charts.propOut.update();
   }
   if(charts.propMoM) {
     charts.propMoM.data.labels = MONTHS;
@@ -1608,7 +1671,13 @@ function clearFilters() {
     if(charts.propMoM.data.datasets[1]) charts.propMoM.data.datasets[1].data = propMoM_prev;
     charts.propMoM.update();
   }
-  // Also clear table filters
+  if(charts.propYoY) {
+    charts.propYoY.data.labels = MONTHS;
+    charts.propYoY.data.datasets[0].data = propMoM_prev;
+    charts.propYoY.data.datasets[1].data = propMoM;
+    charts.propYoY.update();
+  }
+
   var zf = document.getElementById('tblZoneFilter'); if(zf) zf.value = 'all';
   var mf = document.getElementById('tblModeFilter'); if(mf) mf.value = 'all';
   var sf = document.getElementById('tblSearch');     if(sf) sf.value = '';
@@ -1637,38 +1706,82 @@ function applyDateFilter(section) {
   if(from > to) { alert("From date must be before To date."); return; }
 
   var idx = getMonthsInRange(from, to);
-  if(idx.length === 0) return;
+  if(idx.length === 0) { alert("No data found in selected date range."); return; }
   var fl = idx.map(function(i){ return MONTHS[i]; });
 
-  // Water section
+  // --- WATER section ---
   if(section === 'water') {
+    var annualWaterDemand = sum(waterDemand);
+    var monthlyWaterDemand = Math.round(annualWaterDemand / 12);
+    var fMoM     = idx.map(function(i){ return waterMoM[i]      || 0; });
+    var fMoMPrev = idx.map(function(i){ return waterMoM_prev[i] || 0; });
+    var fDemand  = idx.map(function(){ return monthlyWaterDemand; });
+
+    var totalWaterOnline = sum(waterColl.online);
+    var totalWaterCash   = sum(waterColl.cash);
+    var totalWaterCheque = sum(waterColl.cheque);
+    var totalWaterColl   = sum(waterColl.all);
+    var wOnlineRatio = totalWaterColl ? totalWaterOnline / totalWaterColl : 0.33;
+    var wCashRatio   = totalWaterColl ? totalWaterCash   / totalWaterColl : 0.33;
+    var wChequeRatio = totalWaterColl ? totalWaterCheque / totalWaterColl : 0.34;
+
+    var fCollTotal   = sum(fMoM);
+    var fOnlineTotal = Math.round(fCollTotal * wOnlineRatio);
+    var fCashTotal   = Math.round(fCollTotal * wCashRatio);
+    var fChequeTotal = Math.round(fCollTotal * wChequeRatio);
+    var fDemTotal    = sum(fDemand);
+    var fOutstanding = Math.max(0, fDemTotal - fCollTotal);
+
+    // Update stat strip
+    makeStatStrip("waterStatStrip",[
+      {label:"Total Demand",  value:fmtFull(fDemTotal),    sub:fmt(fDemTotal)+' (filtered)'},
+      {label:"Collected",     value:fmtFull(fCollTotal),   sub:fmt(fCollTotal)},
+      {label:"Outstanding",   value:fmtFull(fOutstanding), sub:fmt(fOutstanding)},
+      {label:"Efficiency",    value:pct(fCollTotal,fDemTotal)+"%"},
+      {label:"Online",        value:fmtFull(fOnlineTotal), sub:pct(fOnlineTotal,fCollTotal)+"% of coll."},
+      {label:"Cash",          value:fmtFull(fCashTotal)},
+      {label:"Cheque",        value:fmtFull(fChequeTotal)},
+      {label:"Period",        value:fl[0]+(fl.length>1?' – '+fl[fl.length-1]:'')}
+    ]);
+
+    // Update charts
     if(charts.water) {
       charts.water.data.labels = fl;
-      charts.water.data.datasets[0].data = idx.map(function(i){ return waterDemand[i % waterDemand.length]; });
-      charts.water.data.datasets[1].data = idx.map(function(i){ return waterColl.all[i % waterColl.all.length]; });
+      charts.water.data.datasets[0].data = fDemand;
+      charts.water.data.datasets[1].data = fMoM;
       charts.water.update();
+    }
+    if(charts.waterPie) {
+      charts.waterPie.data.datasets[0].data = [fOnlineTotal, fCashTotal, fChequeTotal, Math.max(0,fOutstanding)];
+      charts.waterPie.update();
     }
     if(charts.waterMoM) {
       charts.waterMoM.data.labels = fl;
-      charts.waterMoM.data.datasets[0].data = idx.map(function(i){ return waterMoM[i]; });
-      if(charts.waterMoM.data.datasets[1]) charts.waterMoM.data.datasets[1].data = idx.map(function(i){ return waterMoM_prev[i]; });
+      charts.waterMoM.data.datasets[0].data = fMoM;
+      if(charts.waterMoM.data.datasets[1]) charts.waterMoM.data.datasets[1].data = fMoMPrev;
       charts.waterMoM.update();
+    }
+    if(charts.waterYoY) {
+      charts.waterYoY.data.labels = fl;
+      charts.waterYoY.data.datasets[0].data = fMoMPrev;
+      charts.waterYoY.data.datasets[1].data = fMoM;
+      charts.waterYoY.update();
     }
     return;
   }
 
-  // Misc sections — bar chart uses MONTHS labels with stacked online/cash/cheque
+  // --- MISC sections ---
   if(miscServices[section] && charts[section]) {
     var s = miscServices[section];
     charts[section].data.labels = fl;
     var ds = charts[section].data.datasets;
     if(ds.length >= 3) {
-      ds[0].data = idx.map(function(i){ return s.online[i]; });
-      ds[1].data = idx.map(function(i){ return s.cash[i]; });
-      ds[2].data = idx.map(function(i){ return s.cheque[i]; });
+      ds[0].data = idx.map(function(i){ return s.online[i] || 0; });
+      ds[1].data = idx.map(function(i){ return s.cash[i]   || 0; });
+      ds[2].data = idx.map(function(i){ return s.cheque[i] || 0; });
     } else {
-      ds[0].data = idx.map(function(i){ return s.demand[i]; });
-      ds[1].data = idx.map(function(i){ return s.all[i]; });
+      ds[0].data = idx.map(function(i){ return s.demand[i] || 0; });
+      ds[1].data = idx.map(function(i){ return s.all[i]    || 0; });
     }
     charts[section].update();
   }
@@ -1681,16 +1794,29 @@ function clearDateFilter(section) {
   if(toEl)   toEl.value   = '';
 
   if(section === 'water') {
+    // Restore full-year stat strip
+    refreshStatStrips(activeFY);
+
     if(charts.water) {
       charts.water.data.labels = WARDS;
       charts.water.data.datasets = buildBarDS(waterDemand, waterColl.all, 'all');
       charts.water.update();
+    }
+    if(charts.waterPie) {
+      charts.waterPie.data.datasets[0].data = [waterOnline, sum(waterColl.cash), sum(waterColl.cheque), Math.max(0,waterOutstanding)];
+      charts.waterPie.update();
     }
     if(charts.waterMoM) {
       charts.waterMoM.data.labels = MONTHS;
       charts.waterMoM.data.datasets[0].data = waterMoM;
       if(charts.waterMoM.data.datasets[1]) charts.waterMoM.data.datasets[1].data = waterMoM_prev;
       charts.waterMoM.update();
+    }
+    if(charts.waterYoY) {
+      charts.waterYoY.data.labels = MONTHS;
+      charts.waterYoY.data.datasets[0].data = waterMoM_prev;
+      charts.waterYoY.data.datasets[1].data = waterMoM;
+      charts.waterYoY.update();
     }
     return;
   }
