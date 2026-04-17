@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,7 +11,7 @@
     window.onerror = function(msg, src, line, col, err) {
       var div = document.getElementById('_jsErrorBanner');
       if(!div) { div = document.createElement('div'); div.id='_jsErrorBanner'; div.style='position:fixed;bottom:0;left:0;right:0;background:#c0202e;color:#fff;padding:10px 16px;font-size:13px;z-index:9999;font-family:monospace;'; document.body.appendChild(div); }
-      div.textContent = '⚠ JS Error: ' + msg + ' (line ' + line + ')';
+      div.textContent = '? JS Error: ' + msg + ' (line ' + line + ')';
       return false;
     };
   </script>
@@ -46,8 +46,8 @@
   </div>
   <div class="breadcrumb-right">
     <div class="fy-switcher">
-      <button class="fy-btn active" id="fyBtn2526" onclick="switchFY('2025-26',this)">FY 2025-26</button>
-      <button class="fy-btn" id="fyBtn2425" onclick="switchFY('2024-25',this)">FY 2024-25</button>
+      <button class="fy-btn active" id="fyBtn2526" onclick="switchFY('2026-27',this)">FY 2026-27</button>
+      <button class="fy-btn" id="fyBtn2425" onclick="switchFY('2025-26',this)">FY 2025-26</button>
     </div>
     <span> Home</span>
     <span class="bc-sep">/</span>
@@ -127,7 +127,7 @@
 <div id="home" class="section active">
   <div class="section-header">
     <h2>Revenue Overview</h2>
-    <div class="section-meta" id="overviewMeta">FY 2025-26 &nbsp;</div>
+    <div class="section-meta" id="overviewMeta">FY 2026-27 &nbsp;</div>
   </div>
 
   <!-- KPI CARDS -->
@@ -212,7 +212,7 @@
   <div class="section-header">
     <h2>Property Tax</h2>
     
-    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2025-26</div>
+    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2026-27</div>
   </div>
   <div class="stat-strip" id="propStatStrip"></div>
   <div class="toolbar">
@@ -266,16 +266,16 @@
           <th title="Property address">Address</th>
           <th title="Zone / Ward">Zone</th>
           <th title="Residential / Commercial / Educational">Type</th>
-          <th title="Arrears: unpaid amount from previous years" class="has-tip">Arrears (₹)</th>
-          <th title="Current year's tax demand" class="has-tip">Current (₹)</th>
-          <th title="Penalty on late payment" class="has-tip">Penalty (₹)</th>
-          <th title="Penalty already paid" class="has-tip">Paid Penalty (₹)</th>
-          <th title="Rebate given (e.g. early payment discount)" class="has-tip">Rebate (₹)</th>
-          <th title="Total Demand = Arrears + Current + Penalty − Rebate" class="has-tip">Total Demand (₹)</th>
-          <th title="Total amount collected so far" class="has-tip">Total Collection (₹)</th>
-          <th title="Total Outstanding = Total Demand − Total Collection" class="has-tip">Outstanding (₹)</th>
+          <th title="Arrears: unpaid amount from previous years" class="has-tip">Arrears (?)</th>
+          <th title="Current year's tax demand" class="has-tip">Current (?)</th>
+          <th title="Penalty on late payment" class="has-tip">Penalty (?)</th>
+          <th title="Penalty already paid" class="has-tip">Paid Penalty (?)</th>
+          <th title="Rebate given (e.g. early payment discount)" class="has-tip">Rebate (?)</th>
+          <th title="Total Demand = Arrears + Current + Penalty - Rebate" class="has-tip">Total Demand (?)</th>
+          <th title="Total amount collected so far" class="has-tip">Total Collection (?)</th>
+          <th title="Total Outstanding = Total Demand - Total Collection" class="has-tip">Outstanding (?)</th>
           <th title="Payment mode used">Mode</th>
-          <th title="Paid = Collection ≥ Demand">Status</th>
+          <th title="Paid = Collection = Demand">Status</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -288,7 +288,7 @@
 <div id="water" class="section">
   <div class="section-header">
     <h2>Water Tax</h2>
-    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2025-26</div>
+    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2026-27</div>
   </div>
   <div class="stat-strip" id="waterStatStrip"></div>
   <div class="toolbar">
@@ -317,7 +317,7 @@
   </div>
 </div>
 
-<!-- ===== MISC SECTIONS — 8 categories (Head Office) ===== -->
+<!-- ===== MISC SECTIONS � 8 categories (Head Office) ===== -->
 <div id="misc-water"      class="section misc-section" data-key="misc-water"></div>
 <div id="misc-health"     class="section misc-section" data-key="misc-health"></div>
 <div id="misc-building"   class="section misc-section" data-key="misc-building"></div>
@@ -331,7 +331,7 @@
 <div id="rts" class="section">
   <div class="section-header">
     <h2> RTS Collections</h2>
-    <div class="section-meta fy-meta" data-suffix="Right to Service Act — All Departments">Right to Service Act — All Departments | FY 2025-26</div>
+    <div class="section-meta fy-meta" data-suffix="Right to Service Act � All Departments">Right to Service Act � All Departments | FY 2026-27</div>
   </div>
  <!--- <p class="section-note">RTS mandates time-bound service delivery. 74 services across 10 departments. Fee-based and free services tracked separately.</p> -->
 
@@ -349,7 +349,7 @@
     <div class="chart-box h280"><canvas id="rtsFeeVsFree"></canvas></div>
   </div>
 
-  <!-- Department-wise service table — commented out, to be enabled when live data is available
+  <!-- Department-wise service table � commented out, to be enabled when live data is available
   <div class="rts-table-header">
     <span id="rtsDeptTitle">All Departments</span>
     <span class="section-meta" id="rtsServiceCount"></span>
@@ -378,7 +378,7 @@
 <div id="digital" class="section">
   <div class="section-header">
     <h2> Digital Collections</h2>
-    <div class="section-meta fy-meta" data-suffix="Online | UPI | NEFT/RTGS">Online | UPI | NEFT/RTGS | FY 2025-26</div>
+    <div class="section-meta fy-meta" data-suffix="Online | UPI | NEFT/RTGS">Online | UPI | NEFT/RTGS | FY 2026-27</div>
   </div>
   <div id="digitalCompareBanner" class="digital-compare"></div>
   <div class="grid">
@@ -393,7 +393,7 @@
 <div id="outstanding" class="section">
   <div class="section-header">
     <h2> Total Outstanding</h2>
-    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2025-26</div>
+    <div class="section-meta fy-meta" data-suffix="Zone-wise">Zone-wise | FY 2026-27</div>
   </div>
   <div class="out-banner" id="outBanner"></div>
   <div class="out-zone-grid" id="outZoneGrid"></div>
@@ -408,7 +408,7 @@
 <div id="reports" class="section">
   <div class="section-header">
     <h2> Reports</h2>
-    <div class="section-meta fy-meta" data-suffix="Property Reports">Property Reports | FY 2025-26</div>
+    <div class="section-meta fy-meta" data-suffix="Property Reports">Property Reports | FY 2026-27</div>
   </div>
 
   <!-- Report tabs -->
@@ -464,7 +464,7 @@
             <th>Usage Type</th>
             <th>Received Date</th>
             <th>Count</th>
-            <th>Collection (₹)</th>
+            <th>Collection (?)</th>
           </tr>
         </thead>
         <tbody id="rptUsageBody"></tbody>
@@ -489,7 +489,7 @@
         <thead>
           <tr>
             <th>Date</th>
-            <th>Amount Collection (₹)</th>
+            <th>Amount Collection (?)</th>
             <th>Pay Mode</th>
           </tr>
         </thead>

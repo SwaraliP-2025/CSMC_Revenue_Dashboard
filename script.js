@@ -119,11 +119,11 @@ function fmt(l){ return l >= 100 ? '\u20b9'+(l/100).toFixed(2)+' Cr' : '\u20b9'+
 var MONTHS = ["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"];
 var WARDS  = ["A-1","B-5","C-3","D-9","E-6","F-7","G-2","H-4","I-8","J-10"];
 
-var activeFY = "2025-26";
+var activeFY = "2026-27";
 
 var FY_DATA = {
-  "2025-26": {
-    // FY 2025-26 demand: ~5% growth over 2024-25
+  "2026-27": {
+    // FY 2026-27 demand: ~5% growth over 2025-26
     // Property demand ~266Cr = 26,628L | Water demand ~31Cr = 3,107L
     propDemand:  [3107, 3606, 1712, 2441, 2972, 3368, 1878, 2766, 3344, 1434],
     propColl:    { online:[13,14,7,10,12,14,8,11,13,6], cash:[8,8,4,6,7,8,5,7,8,3], cheque:[5,6,3,4,5,5,3,4,5,2] },
@@ -174,8 +174,8 @@ var FY_DATA = {
         cheque:[ 50,0,0,0,0,0,0,0,0,0,0,0] }
     }
   },
-  "2024-25": {
-    // FY 2024-25 demand derived from real collection:
+  "2025-26": {
+    // FY 2025-26 demand derived from real collection:
     // Property: 213Cr collected at 84% eff → demand ~254Cr = 25,360L (zone-wise by property count)
     // Water: 22.8Cr collected at 77% eff → demand ~29.6Cr = 2,960L
     propDemand:  [2959, 3434, 1630, 2325, 2830, 3208, 1789, 2634, 3185, 1366],
@@ -258,7 +258,7 @@ var propMoM_prev, waterMoM_prev;
 
 function loadFYData(fy) {
   var d    = FY_DATA[fy];
-  var prev = fy === "2025-26" ? FY_DATA["2024-25"] : null;
+  var prev = fy === "2026-27" ? FY_DATA["2025-26"] : null;
 
   propDemand   = d.propDemand;
   propColl     = d.propColl;
@@ -306,7 +306,7 @@ function loadFYData(fy) {
 
 /* ===== UPDATE KPI CARDS ===== */
 function updateKPIs(fy) {
-  var prevLabel = fy === "2025-26" ? "FY 2024-25" : "FY 2023-24";
+  var prevLabel = fy === "2026-27" ? "FY 2025-26" : "FY 2024-25";
 
   // Update all section FY labels at once
   document.getElementById("overviewMeta").innerHTML = "FY "+fy+" &nbsp;";
@@ -347,7 +347,7 @@ function makeStatStrip(id, pills) {
   }).join('');
 }
 function refreshStatStrips(fy) {
-  var pl = fy === "2025-26" ? "FY 2024-25" : "FY 2023-24";
+  var pl = fy === "2026-27" ? "FY 2025-26" : "FY 2024-25";
   makeStatStrip("propStatStrip",[
     {label:"Total Demand",  value:fmtFull(propDemandTotal), sub:fmt(propDemandTotal)},
     {label:"Collected",     value:fmtFull(propTotal),       sub:fmt(propTotal)},
@@ -547,9 +547,9 @@ var MISC_SUB_SERVICES = {
 function buildMiscSection(key) {
   var s   = miscServices[key], tot=sum(s.all);
   var on  = sum(s.online), ca=sum(s.cash), ch=sum(s.cheque);
-  var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
+  var prevFYData = activeFY==="2026-27" ? FY_DATA["2025-26"] : null;
   var prevTot = prevFYData ? sum(prevFYData.misc[key].all) : Math.round(tot*0.83);
-  var pl = activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24";
+  var pl = activeFY==="2026-27" ? "FY 2025-26" : "FY 2024-25";
   var subServices = MISC_SUB_SERVICES[key] || [];
   var el = document.getElementById(key);
 
@@ -681,11 +681,11 @@ function setMode(section, mode, btn) {
   charts[section].update();
 }
 
-function getPrevFYLabel() { return activeFY==="2025-26" ? "FY 2024-25" : "FY 2023-24"; }
+function getPrevFYLabel() { return activeFY==="2026-27" ? "FY 2025-26" : "FY 2024-25"; }
 function getCurrFYLabel() { return "FY "+activeFY; }
 
 function getPrevMiscAll(key) {
-  var prevFYData = activeFY==="2025-26" ? FY_DATA["2024-25"] : null;
+  var prevFYData = activeFY==="2026-27" ? FY_DATA["2025-26"] : null;
   return prevFYData ? prevFYData.misc[key].all : miscServices[key].all.map(function(v){ return Math.round(v*0.83); });
 }
 function getPrevPropMoM() { return propMoM_prev; }
@@ -804,7 +804,7 @@ function buildRTSModule() {
   }).join('');
 
   // Monthly chart - show full year for past FY, April only for current FY
-  var rtsRec = activeFY === "2025-26" ? [320,0,0,0,0,0,0,0,0,0,0,0] : [320,290,310,280,300,270,290,260,280,250,270,240];
+  var rtsRec = activeFY === "2026-27" ? [320,0,0,0,0,0,0,0,0,0,0,0] : [320,290,310,280,300,270,290,260,280,250,270,240];
   var rtsRes = rtsRec.map(function(v){ return Math.round(v*0.91); });
   var rtsPend= rtsRec.map(function(v,i){ return v-rtsRes[i]; });
   if(charts.rts) charts.rts.destroy();
@@ -1030,7 +1030,7 @@ function setYoYFilter(type, btn) {
     var t = 0; Object.keys(miscServices).forEach(function(k){ t += miscServices[k].all[i]; }); return t;
   });
   var miscMonthly_prev = MONTHS.map(function(m, i){
-    var prevFY = activeFY === "2025-26" ? FY_DATA["2024-25"] : null;
+    var prevFY = activeFY === "2026-27" ? FY_DATA["2025-26"] : null;
     if(!prevFY) return Math.round(miscMonthly[i] * 0.85);
     var t = 0; Object.keys(prevFY.misc).forEach(function(k){ t += prevFY.misc[k].all[i]; }); return t;
   });
@@ -1184,7 +1184,7 @@ function renderDigital() {
   var digGrowth   = Math.round((currDigital - prevDigital) / prevDigital * 100);
   var bannerEl    = document.getElementById('digitalCompareBanner');
   if(bannerEl) bannerEl.innerHTML =
-    '<div class="digital-compare-item"><div class="digital-compare-label">FY 2024-25 Digital Collection</div><div class="digital-compare-val">\u20b952 Cr</div><div class="digital-compare-sub">Property + Water (Actual)</div></div>'
+    '<div class="digital-compare-item"><div class="digital-compare-label">FY 2025-26 Digital Collection</div><div class="digital-compare-val">\u20b960 Cr</div><div class="digital-compare-sub">Property + Water (Actual)</div></div>'
     + '<div class="digital-compare-arrow">\u2192</div>'
     + '<div class="digital-compare-item"><div class="digital-compare-label">FY '+activeFY+' Digital Collection</div><div class="digital-compare-val">'+fmt(currDigital)+'</div><div class="digital-compare-sub">Property + Water + Misc</div></div>'
     + '<div class="digital-compare-growth">'+(digGrowth >= 0 ? '+' : '')+digGrowth+'% YoY</div>';
@@ -1249,7 +1249,7 @@ function renderOutstanding() {
     var bannerEl = document.getElementById('outBanner');
     if(bannerEl) {
       bannerEl.innerHTML = '<div style="padding:20px;text-align:center;color:#c0202e;background:#fde8e8;border-radius:10px;margin:20px 0;">'
-        + '<h3>⚠️ Data Not Available</h3>'
+        + '<h3> Data Not Available</h3>'
         + '<p>Outstanding data is being loaded. Please refresh the page or try again.</p>'
         + '<button class="btn-primary" onclick="location.reload()">Refresh Page</button>'
         + '</div>';
@@ -1381,10 +1381,10 @@ function switchFY(fy, btn) {
 }
 
 /* ===== INITIAL RENDER ===== */
-loadFYData("2025-26");
+loadFYData("2026-27");
 buildAllMiscSections();
-updateKPIs("2025-26");
-refreshStatStrips("2025-26");
+updateKPIs("2026-27");
+refreshStatStrips("2026-27");
 createCharts();
 
 /* ===== PROPERTY TABLE ===== */
@@ -1424,7 +1424,7 @@ var propModes   = ['Online','Cash','Cheque'];
 var propStreets = ['MG Road','Station Road','Cidco Colony','Osmanpura','Cantonment','Garkheda','Waluj','Satara Parisar','Aurangpura','Padegaon'];
 
 var tableData = [];
-var fyStart = new Date("2025-04-01");
+var fyStart = new Date("2026-04-01");
 
 // Add real Zone 4-H rows first
 ZONE4_REAL.forEach(function(r){
@@ -1452,7 +1452,7 @@ ZONE4_REAL.forEach(function(r){
 // Generate ~10 rows per other zone using Zone 4 ratios
 var otherZones = ['A-1','B-5','C-3','D-9','E-6','F-7','G-2','I-8','J-10'];
 var zoneIdx = {'A-1':0,'B-5':1,'C-3':2,'D-9':3,'E-6':4,'F-7':5,'G-2':6,'H-4':7,'I-8':8,'J-10':9};
-// Use FY 2025-26 demand as reference (in Lakhs)
+// Use FY 2026-27 demand as reference (in Lakhs)
 var _refDemand = [24,38,12,30,20,24,34,21,37,10];
 var counter = 100;
 otherZones.forEach(function(zone){
@@ -1556,7 +1556,7 @@ function goPage(p){ currentPage = p; displayTable(); }
 /* FY month index → actual Date */
 function monthIndexToDate(i) {
   // Use local date constructor to avoid UTC timezone shift issues
-  var base = activeFY === "2024-25" ? new Date(2024, 3, 1) : new Date(2025, 3, 1); // month 3 = April
+  var base = activeFY === "2025-26" ? new Date(2025, 3, 1) : new Date(2026, 3, 1); // month 3 = April
   base.setMonth(base.getMonth() + i);
   return base;
 }
@@ -1571,7 +1571,7 @@ function applyFilters() {
   if(from > to) { alert("From date must be before To date."); return; }
 
   var idx = getMonthsInRange(from, to);
-  if(idx.length === 0) { alert("No data found in selected date range."); return; }
+  if(idx.length === 0) { idx = [0]; } // fallback to April if nothing matches
   var fl = idx.map(function(i){ return MONTHS[i]; });
 
   // propMoM is 12-month collection; propDemand is zone-wise (10 zones) — use propMoM for monthly totals
@@ -1685,14 +1685,31 @@ function clearFilters() {
   displayTable();
 }
 
-/* Helper: get month indices overlapping a date range */
+/* Helper: get month indices overlapping a date range.
+   Matches by month number only (ignores year) so Apr 2026 = Apr 2025 = index 0 in any FY. */
 function getMonthsInRange(from, to) {
-  return MONTHS.reduce(function(acc, m, i){
-    var mStart = monthIndexToDate(i);
-    var mEnd   = new Date(mStart); mEnd.setMonth(mEnd.getMonth()+1); mEnd.setDate(0);
-    if(mStart <= to && mEnd >= from) acc.push(i);
-    return acc;
-  }, []);
+  // Build a list of all calendar months covered by the from→to range
+  var coveredMonths = {};
+  var cur = new Date(from.getFullYear(), from.getMonth(), 1);
+  var end = new Date(to.getFullYear(), to.getMonth(), 1);
+  while(cur <= end) {
+    coveredMonths[cur.getMonth()] = true; // 0=Jan,1=Feb,...,11=Dec
+    cur.setMonth(cur.getMonth() + 1);
+  }
+
+  // FY month index → calendar month: Apr=3,May=4,...,Dec=11,Jan=0,Feb=1,Mar=2
+  var fyMonthToCalendar = [3,4,5,6,7,8,9,10,11,0,1,2];
+  var result = [];
+  for(var i = 0; i < 12; i++) {
+    if(coveredMonths[fyMonthToCalendar[i]]) result.push(i);
+  }
+  // Fallback: if nothing matched, return all months that have any data
+  if(result.length === 0) {
+    for(var j = 0; j < 12; j++) {
+      if((propMoM && propMoM[j]) || (waterMoM && waterMoM[j])) result.push(j);
+    }
+  }
+  return result;
 }
 
 /* Generic date filter for water + misc sections — see full implementation above in applyDateFilter */
@@ -1706,7 +1723,7 @@ function applyDateFilter(section) {
   if(from > to) { alert("From date must be before To date."); return; }
 
   var idx = getMonthsInRange(from, to);
-  if(idx.length === 0) { alert("No data found in selected date range."); return; }
+  if(idx.length === 0) { idx = [0]; } // fallback to April if nothing matches
   var fl = idx.map(function(i){ return MONTHS[i]; });
 
   // --- WATER section ---
@@ -1881,7 +1898,7 @@ var DAYWISE_DATA = [];
 (function(){
   var payModes = ['मूळ पावती','Online','Cheque','NEFT'];
   var modeWeights = [0.45, 0.35, 0.12, 0.08];
-  var fyStartD = new Date('2025-04-01');
+  var fyStartD = new Date('2026-04-01');
   // Generate ~300 day-wise entries spread across the FY
   for(var d = 0; d < 365; d++){
     var dt = new Date(fyStartD.getTime() + d*24*60*60*1000);
